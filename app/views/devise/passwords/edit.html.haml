@@ -1,0 +1,24 @@
+.w-full.max-w-md
+  .text-center.mb-8
+    %h1.text-3xl.font-bold.text-indigo-400 Fartlek
+    %p.mt-2.text-sm.text-gray-400 Choisir un nouveau mot de passe
+
+  .rounded-lg.bg-gray-900.px-8.py-10.shadow-lg.ring-1.ring-gray-800
+    = render "devise/shared/error_messages", resource: resource
+
+    = form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put, class: "space-y-6" }) do |f|
+      = f.hidden_field :reset_password_token
+
+      %div
+        = f.label :password, "Nouveau mot de passe", class: "block text-sm font-medium text-gray-300 mb-1"
+        = f.password_field :password, autofocus: true, autocomplete: "new-password", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+        %p.mt-1.text-xs.text-gray-500= "#{@minimum_password_length} caractères minimum"
+
+      %div
+        = f.label :password_confirmation, "Confirmer", class: "block text-sm font-medium text-gray-300 mb-1"
+        = f.password_field :password_confirmation, autocomplete: "new-password", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+      %div
+        = f.submit "Changer le mot de passe", class: "flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+
+    = render "devise/shared/links"

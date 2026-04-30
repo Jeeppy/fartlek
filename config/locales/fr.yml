@@ -1,0 +1,38 @@
+---
+fr:
+  activerecord:
+    errors:
+      models:
+        user:
+          attributes:
+            date_of_birth:
+              in_future: "ne peut pas être dans le futur"
+            email:
+              taken: "est déjà utilisé"
+    attributes:
+      user:
+        first_name: "Prénom"
+        last_name: "Nom"
+        email: "Email"
+        password: "Mot de passe"
+        password_confirmation: "Confirmation du mot de passe"
+        current_password: "Mot de passe actuel"
+        gender: "Genre"
+        date_of_birth: "Date de naissance"
+        time_zone: "Fuseau horaire"
+    models:
+      user: "Utilisateur"
+  devise:
+    sessions:
+      signed_in: "Connecté(e) avec succès."
+      signed_out: "Déconnecté(e) avec succès."
+    registrations:
+      signed_up: "Bienvenue ! Ton compte a été créé."
+      updated: "Profil mis à jour."
+      destroyed: "Ton compte a été supprimé. À bientôt !"
+    passwords:
+      send_instructions: "Instructions envoyées par email."
+      updated: "Mot de passe modifié avec succès."
+    failure:
+      invalid: "Email ou mot de passe invalide."
+      unauthenticated: "Tu dois te connecter pour accéder à cette page."

@@ -1,0 +1,59 @@
+# Ruby / Bundler
+/.bundle
+/vendor/bundle
+*.gem
+
+# Rails
+/log/*
+/tmp/*
+/storage/*
+/public/assets
+/public/packs
+!/log/.keep
+!/tmp/.keep
+!/storage/.keep
+
+# Tailwind build
+/app/assets/builds/*
+!/app/assets/builds/.keep
+
+# Environment
+/.env
+/.env.*
+!/.env.example
+
+# Credentials (keep encrypted versions)
+/config/master.key
+/config/credentials/*.key
+
+# Database
+/db/*.sqlite3
+/db/*.sqlite3-journal
+/db/schema_cache.yml
+
+# Coverage
+/coverage/
+
+# Node
+/node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.byebug_history
+
+# Docker
+docker-compose.override.yml
+
+# RSpec
+/tmp/spec_examples.txt
+
+# SimpleCov
+/coverage/

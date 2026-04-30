@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+
+echo "══════════════════════════════════════════"
+echo "  🔍 Fartlek — Lint Suite"
+echo "══════════════════════════════════════════"
+
+echo ""
+echo "▶ RuboCop..."
+bundle exec rubocop --parallel
+
+echo ""
+echo "▶ HAML-Lint..."
+bundle exec haml-lint app/views
+
+echo ""
+echo "══════════════════════════════════════════"
+echo "  ✅ All clean!"
+echo "══════════════════════════════════════════"

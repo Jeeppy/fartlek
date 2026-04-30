@@ -1,0 +1,17 @@
+- content_for(:title) { "Dashboard" }
+
+.space-y-6
+  %div
+    %h1.text-2xl.font-bold.text-gray-100
+      Bonjour #{current_user.first_name} 👋
+    %p.mt-1.text-sm.text-gray-400
+      Bienvenue sur ton carnet d'entraînement.
+
+  .grid.grid-cols-1.gap-6{ class: "sm:grid-cols-2 lg:grid-cols-4" }
+    - [{ label: "Activités ce mois", value: "—", icon: "🏃" }, { label: "Volume (km)", value: "—", icon: "📏" }, { label: "Durée totale", value: "—", icon: "⏱️" }, { label: "Streak", value: "—", icon: "🔥" }].each do |card|
+      .overflow-hidden.rounded-lg.bg-gray-900.px-4.py-5.shadow{ class: "ring-1 ring-gray-800 sm:p-6" }
+        .flex.items-center
+          %span.text-2xl= card[:icon]
+          .ml-4
+            %dt.truncate.text-sm.font-medium.text-gray-400= card[:label]
+            %dd.mt-1.text-2xl.font-semibold.text-gray-100= card[:value]

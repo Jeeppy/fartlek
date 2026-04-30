@@ -1,0 +1,54 @@
+- content_for(:title) { "Mon profil" }
+
+.mx-auto.max-w-2xl
+  %h1.text-2xl.font-bold.text-gray-100.mb-6 Mon profil
+
+  .rounded-lg.bg-gray-900.px-8.py-10.shadow-lg.ring-1.ring-gray-800
+    = render "devise/shared/error_messages", resource: resource
+
+    = form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "space-y-6" }) do |f|
+      .grid.grid-cols-2.gap-4
+        %div
+          = f.label :first_name, "Prénom", class: "block text-sm font-medium text-gray-300 mb-1"
+          = f.text_field :first_name, autocomplete: "given-name", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+        %div
+          = f.label :last_name, "Nom", class: "block text-sm font-medium text-gray-300 mb-1"
+          = f.text_field :last_name, autocomplete: "family-name", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+      %div
+        = f.label :email, class: "block text-sm font-medium text-gray-300 mb-1"
+        = f.email_field :email, autocomplete: "email", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+      .grid.grid-cols-2.gap-4
+        %div
+          = f.label :gender, "Genre", class: "block text-sm font-medium text-gray-300 mb-1"
+          = f.select :gender, options_for_select([["Homme", "male"], ["Femme", "female"], ["Autre", "other"]], resource.gender), {}, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+        %div
+          = f.label :date_of_birth, "Date de naissance", class: "block text-sm font-medium text-gray-300 mb-1"
+          = f.date_field :date_of_birth, max: Date.current, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+      %div
+        = f.label :time_zone, "Fuseau horaire", class: "block text-sm font-medium text-gray-300 mb-1"
+        = f.time_zone_select :time_zone, nil, {}, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+      %hr.border-gray-800
+
+      %p.text-sm.text-gray-500 Laisse vide si tu ne veux pas changer de mot de passe.
+
+      %div
+        = f.label :password, "Nouveau mot de passe", class: "block text-sm font-medium text-gray-300 mb-1"
+        = f.password_field :password, autocomplete: "new-password", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+      %div
+        = f.label :password_confirmation, "Confirmer le nouveau mot de passe", class: "block text-sm font-medium text-gray-300 mb-1"
+        = f.password_field :password_confirmation, autocomplete: "new-password", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+      %hr.border-gray-800
+
+      %div
+        = f.label :current_password, "Mot de passe actuel (requis pour confirmer)", class: "block text-sm font-medium text-gray-300 mb-1"
+        = f.password_field :current_password, autocomplete: "current-password", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+      .flex.items-center.justify-between
+        = f.submit "Mettre à jour", class: "rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+        = button_to "Supprimer mon compte", registration_path(resource_name), method: :delete, data: { turbo_confirm: "Es-tu sûr(e) ? Cette action est irréversible." }, class: "text-sm font-medium text-red-400 hover:text-red-300"

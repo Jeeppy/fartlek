@@ -1,0 +1,55 @@
+linters:
+  LineLength:
+    enabled: true
+    max: 120
+
+  SpaceBeforeScript:
+    enabled: true
+
+  SpaceInsideHashAttributes:
+    enabled: true
+    style: space
+
+  TrailingWhitespace:
+    enabled: true
+
+  UnnecessaryStringOutput:
+    enabled: true
+
+  ViewLength:
+    enabled: true
+    max: 100
+
+  RuboCop:
+    enabled: true
+    config_file: .rubocop.yml
+    ignored_cops:
+      - Layout/LineLength
+      - Metrics/BlockLength
+      - Style/FrozenStringLiteralComment
+
+  ClassAttributeWithStaticValue:
+    enabled: true
+
+  ConsecutiveComments:
+    enabled: true
+
+  ConsecutiveSilentScripts:
+    enabled: true
+    max_consecutive: 3
+
+  IdNames:
+    enabled: true
+    style: snake_case
+
+  MultilinePipe:
+    enabled: true
+
+  MultilineScript:
+    enabled: true
+
+  NoPlaceholders:
+    enabled: false
+
+  RepeatedId:
+    enabled: true
