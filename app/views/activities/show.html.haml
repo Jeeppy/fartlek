@@ -1,0 +1,62 @@
+- content_for(:title) { @activity.title.presence || @activity.sport.humanize }
+
+.space-y-6
+  .flex.items-center.justify-between
+    .flex.items-center.gap-3
+      %span.text-3xl= @activity.sport_icon
+      %div
+        %h1.text-2xl.font-bold.text-gray-100= @activity.title.presence || @activity.sport.humanize
+        %p.text-sm.text-gray-400= l(@activity.performed_at, format: "%A %d %B %Y à %H:%M")
+
+    .flex.items-center.gap-2
+      = link_to "Modifier", edit_activity_path(@activity), class: "rounded-lg bg-gray-800 px-4 py-2 text-sm font-medium text-gray-300 ring-1 ring-gray-700 hover:bg-gray-700"
+      = button_to "Supprimer", activity_path(@activity), method: :delete, data: { turbo_confirm: "Supprimer cette activité ?" }, class: "rounded-lg bg-red-900/50 px-4 py-2 text-sm font-medium text-red-300 ring-1 ring-red-800 hover:bg-red-900"
+
+  -# Stats grid
+  .grid.grid-cols-2.gap-4{ class: "sm:grid-cols-3 lg:grid-cols-6" }
+    - stats = []
+    - stats << { label: "Distance", value: "#{@activity.distance_km} km" } if @activity.distance_km
+    - stats << { label: "Durée", value: @activity.duration_formatted } if @activity.duration_formatted
+    - stats << { label: "Allure", value: @activity.pace_formatted } if @activity.pace_formatted
+    - stats << { label: "D+", value: "#{@activity.elevation_gain_meters} m" } if @activity.elevation_gain_meters
+    - stats << { label: "FC moy", value: "#{@activity.average_heart_rate} bpm" } if @activity.average_heart_rate
+    - stats << { label: "FC max", value: "#{@activity.max_heart_rate} bpm" } if @activity.max_heart_rate
+    - stats << { label: "Calories", value: @activity.calories } if @activity.calories
+    - stats << { label: "RPE", value: "#{@activity.rpe}/10" } if @activity.rpe
+    - stats << { label: "Ressenti", value: @activity.feeling&.humanize } if @activity.feeling
+
+    - stats.each do |stat|
+      .rounded-lg.bg-gray-900.px-4.py-4.ring-1.ring-gray-800
+        %dt.text-xs.font-medium.text-gray-500= stat[:label]
+        %dd.mt-1.text-lg.font-semibold.text-gray-100= stat[:value]
+
+  -# Notes
+  - if @activity.notes.present?
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+      %h2.text-sm.font-medium.text-gray-400.mb-2 Notes
+      %p.text-sm.text-gray-300.whitespace-pre-wrap= @activity.notes
+
+  -# Laps
+  - if @activity.activity_laps.any?
+    .rounded-lg.bg-gray-900.ring-1.ring-gray-800.overflow-hidden
+      %h2.px-5.py-3.text-sm.font-medium.text-gray-400.border-b.border-gray-800 Laps
+      %table.w-full.text-sm
+        %thead
+          %tr.border-b.border-gray-800.text-left.text-xs.text-gray-500
+            %th.px-5.py-2 #
+            %th.px-5.py-2 Distance
+            %th.px-5.py-2 Durée
+            %th.px-5.py-2 Allure
+            %th.px-5.py-2 FC
+            %th.px-5.py-2 D+
+        %tbody
+          - @activity.activity_laps.ordered.each do |lap|
+            %tr.border-b.border-gray-800
+              %td.px-5.py-2.text-gray-400= lap.lap_number
+              %td.px-5.py-2.text-gray-100= lap.distance_meters ? "#{(lap.distance_meters / 1000.0).round(2)} km" : "—"
+              %td.px-5.py-2.text-gray-100= lap.duration_seconds ? "#{lap.duration_seconds / 60}:#{format('%02d', lap.duration_seconds % 60)}" : "—"
+              %td.px-5.py-2.text-gray-100= lap.pace_formatted || "—"
+              %td.px-5.py-2.text-gray-100= lap.average_heart_rate || "—"
+              %td.px-5.py-2.text-gray-100= lap.elevation_gain_meters ? "#{lap.elevation_gain_meters} m" : "—"
+
+  = link_to "← Retour", activities_path, class: "inline-block text-sm text-gray-400 hover:text-gray-300"

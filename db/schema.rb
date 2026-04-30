@@ -10,9 +10,46 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_29_121910) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_30_090034) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "activities", force: :cascade do |t|
+    t.integer "average_heart_rate"
+    t.integer "average_pace_seconds_per_km"
+    t.integer "calories"
+    t.datetime "created_at", null: false
+    t.integer "distance_meters"
+    t.integer "duration_seconds"
+    t.integer "elevation_gain_meters"
+    t.integer "feeling"
+    t.integer "max_heart_rate"
+    t.text "notes"
+    t.datetime "performed_at", null: false
+    t.integer "rpe"
+    t.integer "sport", null: false
+    t.jsonb "strava_data"
+    t.bigint "strava_id"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["strava_id"], name: "index_activities_on_strava_id", unique: true
+    t.index ["user_id", "performed_at"], name: "index_activities_on_user_id_and_performed_at"
+    t.index ["user_id"], name: "index_activities_on_user_id"
+  end
+
+  create_table "activity_laps", force: :cascade do |t|
+    t.bigint "activity_id", null: false
+    t.integer "average_heart_rate"
+    t.integer "average_pace_seconds_per_km"
+    t.datetime "created_at", null: false
+    t.integer "distance_meters"
+    t.integer "duration_seconds"
+    t.integer "elevation_gain_meters"
+    t.integer "lap_number", null: false
+    t.datetime "updated_at", null: false
+    t.index ["activity_id"], name: "index_activity_laps_on_activity_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.boolean "admin", default: false, null: false
@@ -36,4 +73,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_29_121910) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  add_foreign_key "activities", "users"
+  add_foreign_key "activity_laps", "activities"
 end

@@ -1,0 +1,43 @@
+- content_for(:title) { "Calendrier" }
+
+= turbo_frame_tag "calendar" do
+  .space-y-4
+    -# Header navigation
+    .flex.items-center.justify-between
+      = link_to month_calendar_path(@prev_month.year, @prev_month.month), data: { turbo_frame: "calendar" }, class: "rounded-lg bg-gray-900 px-3 py-2 text-sm text-gray-400 ring-1 ring-gray-800 hover:bg-gray-800" do
+        ← Précédent
+
+      %h2.text-lg.font-semibold.text-gray-100= l(@date, format: "%B %Y").capitalize
+
+      = link_to month_calendar_path(@next_month.year, @next_month.month), data: { turbo_frame: "calendar" }, class: "rounded-lg bg-gray-900 px-3 py-2 text-sm text-gray-400 ring-1 ring-gray-800 hover:bg-gray-800" do
+        Suivant →
+
+    -# Day headers
+    .grid.grid-cols-7.gap-1
+      - %w[Lun Mar Mer Jeu Ven Sam Dim].each do |day|
+        .py-2.text-center.text-xs.font-medium.text-gray-500= day
+
+    -# Calendar grid
+    .grid.grid-cols-7.gap-1
+      -# Blank cells before first day
+      - start_day = @date.beginning_of_month.cwday - 1
+      - start_day.times do
+        .min-h-24.rounded-lg.bg-gray-950
+
+      -# Days of the month
+      - (@date.beginning_of_month..@date.end_of_month).each do |day|
+        - today = day == Date.current
+        - activities = @activities[day] || []
+        .min-h-24.rounded-lg.p-2{ class: today ? "bg-gray-800 ring-1 ring-indigo-500" : "bg-gray-900 ring-1 ring-gray-800" }
+          .flex.items-center.justify-between.mb-1
+            %span.text-xs.font-medium{ class: today ? "text-indigo-400" : "text-gray-400" }= day.day
+            - if activities.any?
+              %span.text-xs.text-gray-500= activities.size
+
+          .space-y-1
+            - activities.first(3).each do |activity|
+              = link_to activity_path(activity), data: { turbo_frame: "_top" }, class: "block truncate rounded px-1.5 py-0.5 text-xs hover:bg-gray-700" do
+                %span= activity.sport_icon
+                %span.text-gray-300= activity.distance_km ? "#{activity.distance_km}km" : activity.duration_formatted
+            - if activities.size > 3
+              %span.text-xs.text-gray-500= "+#{activities.size - 3}"

@@ -7,6 +7,9 @@
 
         .hidden{ class: "sm:ml-8 sm:flex sm:space-x-4" }
           = nav_link "Dashboard", authenticated_root_path
+        = nav_link "Calendrier", calendar_path
+        = nav_link "Semaine", week_path(date: Date.current.beginning_of_week)
+        = nav_link "Activités", activities_path
 
       .flex.items-center
         .relative{ data: { controller: "dropdown" } }

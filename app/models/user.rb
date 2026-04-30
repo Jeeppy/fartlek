@@ -4,6 +4,8 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable, :trackable
 
+  has_many :activities, dependent: :destroy
+
   # ─── Enums ────────────────────────────────────────────
   enum :gender, { male: 0, female: 1, other: 2 }
 
