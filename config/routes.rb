@@ -26,6 +26,10 @@ Rails.application.routes.draw do
     post "pace_zones/generate", to: "pace_zones#generate", as: :generate_pace_zones
   end
 
+  resources :user_metrics
+  resources :daily_journals, param: :date
+  resources :weekly_journals, param: :week
+
   resources :activities do
     member do
       patch :update_rpe

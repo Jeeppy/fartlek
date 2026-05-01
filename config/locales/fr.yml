@@ -77,3 +77,9 @@ fr:
       default: "%d/%m/%Y %H:%M"
       short: "%d %b %H:%M"
       long: "%A %d %B %Y à %H:%M"
+  metric_types:
+    weight: "Poids"
+    resting_hr: "FC repos"
+    vma_test: "Test VMA"
+    vo2max: "VO2max"
+    body_fat: "Masse grasse"

@@ -1,0 +1,24 @@
+= form_with(model: metric, class: "space-y-6") do |f|
+  .grid.grid-cols-2.gap-4
+    %div
+      = f.label :metric_type, "Type", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.select :metric_type, UserMetric.metric_types.keys.map { |t| [I18n.t("metric_types.#{t}", default: t.humanize), t] }, {}, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :recorded_on, "Date", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.date_field :recorded_on, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  .grid.grid-cols-2.gap-4
+    %div
+      = f.label :value, "Valeur", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.number_field :value, step: 0.01, min: 0, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :unit, "Unité", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.text_field :unit, readonly: true, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-500 text-sm"
+
+  %div
+    = f.label :notes, "Notes", class: "block text-sm font-medium text-gray-300 mb-1"
+    = f.text_area :notes, rows: 2, placeholder: "Conditions, remarques...", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  .flex.items-center.gap-4
+    = f.submit (metric.persisted? ? "Mettre à jour" : "Enregistrer"), class: "rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500 cursor-pointer focus:outline-none"
+    = link_to "Annuler", user_metrics_path(type: metric.metric_type), class: "text-sm text-gray-400 hover:text-gray-300"

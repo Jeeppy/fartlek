@@ -1,0 +1,48 @@
+- content_for(:title) { "Métriques" }
+
+.space-y-6
+  .flex.items-center.justify-between
+    %h1.text-2xl.font-bold.text-gray-100 Métriques
+
+    = link_to new_user_metric_path(type: @metric_type), class: "rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500" do
+      + Nouvelle mesure
+
+  -# Type tabs
+  .flex.gap-2
+    - UserMetric.metric_types.keys.each do |type|
+      - active = type == @metric_type
+      = link_to I18n.t("metric_types.#{type}", default: type.humanize), user_metrics_path(type: type), class: "rounded-lg px-4 py-2 text-sm font-medium #{active ? 'bg-indigo-600 text-white' : 'bg-gray-900 text-gray-400 ring-1 ring-gray-800 hover:bg-gray-800'}"
+
+  -# Latest value
+  - if @latest
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+      .flex.items-center.justify-between
+        %div
+          %span.text-sm.text-gray-500 Dernière mesure
+          .text-3xl.font-bold.text-gray-100.mt-1
+            = "#{@latest.value} #{@latest.unit}"
+        %span.text-sm.text-gray-500= l(@latest.recorded_on, format: "%d %B %Y")
+
+  -# History
+  - if @metrics.any?
+    .rounded-lg.bg-gray-900.ring-1.ring-gray-800.overflow-hidden
+      %table.w-full.text-sm
+        %thead
+          %tr.border-b.border-gray-800.text-left.text-xs.text-gray-500
+            %th.px-5.py-3 Date
+            %th.px-5.py-3 Valeur
+            %th.px-5.py-3 Notes
+            %th.px-5.py-3
+        %tbody
+          - @metrics.each do |metric|
+            %tr.border-b.border-gray-800
+              %td.px-5.py-3.text-gray-300= l(metric.recorded_on, format: "%d %b %Y")
+              %td.px-5.py-3.text-gray-100.font-medium= "#{metric.value} #{metric.unit}"
+              %td.px-5.py-3.text-gray-400.text-xs= metric.notes.presence || "—"
+              %td.px-5.py-3
+                .flex.items-center.gap-3
+                  = link_to "Modifier", edit_user_metric_path(metric), class: "text-indigo-400 hover:text-indigo-300 text-xs"
+                  = button_to "Suppr.", user_metric_path(metric), method: :delete, data: { turbo_confirm: "Supprimer ?" }, class: "text-red-400 hover:text-red-300 text-xs"
+  - else
+    .rounded-lg.bg-gray-900.px-6.py-12.text-center.ring-1.ring-gray-800
+      %p.text-gray-400 Aucune mesure enregistrée.

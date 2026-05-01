@@ -1,0 +1,33 @@
+- content_for(:title) { "Journal quotidien" }
+
+.space-y-6
+  .flex.items-center.justify-between
+    %h1.text-2xl.font-bold.text-gray-100 Journal quotidien
+    = link_to new_daily_journal_path, class: "rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500" do
+      + Aujourd'hui
+
+  - if @journals.any?
+    .space-y-2
+      - @journals.each do |journal|
+        = link_to daily_journal_path(date: journal.date), class: "block rounded-lg bg-gray-900 p-4 ring-1 ring-gray-800 hover:ring-gray-700 transition" do
+          .flex.items-center.justify-between
+            .flex.items-center.gap-4
+              %span.text-2xl= journal.mood_emoji || "📝"
+              %div
+                %h3.text-sm.font-medium.text-gray-100= l(journal.date, format: "%A %d %B").capitalize
+                .flex.items-center.gap-3.mt-1.text-xs.text-gray-400
+                  - if journal.sleep_hours
+                    %span 💤 #{journal.sleep_hours}h
+                  - if journal.fatigue
+                    %span Fatigue #{journal.fatigue}/5
+                  - if journal.soreness
+                    %span Courbatures #{journal.soreness}/5
+            - if journal.comment.present?
+              %span.text-xs.text-gray-500 💬
+
+    - if @pagy.pages > 1
+      .mt-6
+        = pagy_dark_nav(@pagy)
+  - else
+    .rounded-lg.bg-gray-900.px-6.py-12.text-center.ring-1.ring-gray-800
+      %p.text-gray-400 Aucune entrée de journal.

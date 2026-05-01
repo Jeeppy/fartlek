@@ -1,0 +1,30 @@
+- content_for(:title) { "Journal du #{l(@journal.date, format: '%d %B %Y')}" }
+
+.space-y-6
+  .flex.items-center.justify-between
+    %h1.text-2xl.font-bold.text-gray-100 Journal du #{l(@journal.date, format: "%A %d %B %Y").capitalize}
+    = link_to "Modifier", edit_daily_journal_path(date: @journal.date), class: "rounded-lg bg-gray-800 px-4 py-2 text-sm font-medium text-gray-300 ring-1 ring-gray-700 hover:bg-gray-700"
+
+  .grid.grid-cols-2.gap-4{ class: "sm:grid-cols-5" }
+    .rounded-lg.bg-gray-900.px-4.py-4.ring-1.ring-gray-800
+      %dt.text-xs.font-medium.text-gray-500 Humeur
+      %dd.mt-1.text-2xl= @journal.mood_emoji || "—"
+    .rounded-lg.bg-gray-900.px-4.py-4.ring-1.ring-gray-800
+      %dt.text-xs.font-medium.text-gray-500 Sommeil
+      %dd.mt-1.text-lg.font-semibold.text-gray-100= @journal.sleep_quality ? "#{@journal.sleep_quality}/5" : "—"
+    .rounded-lg.bg-gray-900.px-4.py-4.ring-1.ring-gray-800
+      %dt.text-xs.font-medium.text-gray-500 Heures
+      %dd.mt-1.text-lg.font-semibold.text-gray-100= @journal.sleep_hours ? "#{@journal.sleep_hours}h" : "—"
+    .rounded-lg.bg-gray-900.px-4.py-4.ring-1.ring-gray-800
+      %dt.text-xs.font-medium.text-gray-500 Fatigue
+      %dd.mt-1.text-lg.font-semibold.text-gray-100= @journal.fatigue ? "#{@journal.fatigue}/5" : "—"
+    .rounded-lg.bg-gray-900.px-4.py-4.ring-1.ring-gray-800
+      %dt.text-xs.font-medium.text-gray-500 Courbatures
+      %dd.mt-1.text-lg.font-semibold.text-gray-100= @journal.soreness ? "#{@journal.soreness}/5" : "—"
+
+  - if @journal.comment.present?
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+      %h2.text-sm.font-medium.text-gray-400.mb-2 Commentaire
+      %p.text-sm.text-gray-300.whitespace-pre-wrap= @journal.comment
+
+  = link_to "← Retour", daily_journals_path, class: "inline-block text-sm text-gray-400 hover:text-gray-300"

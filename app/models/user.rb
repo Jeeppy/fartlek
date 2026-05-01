@@ -7,6 +7,9 @@ class User < ApplicationRecord
   has_many :activities, dependent: :destroy
   has_many :heart_rate_zones, dependent: :destroy
   has_many :pace_zones, dependent: :destroy
+  has_many :user_metrics, dependent: :destroy
+  has_many :daily_journals, dependent: :destroy
+  has_many :weekly_journals, dependent: :destroy
 
   # ─── Enums ────────────────────────────────────────────
   enum :gender, { male: 0, female: 1, other: 2 }

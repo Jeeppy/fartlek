@@ -1,0 +1,41 @@
+= form_with(model: journal, url: (journal.persisted? ? daily_journal_path(date: journal.date) : daily_journals_path), method: (journal.persisted? ? :patch : :post), class: "space-y-6") do |f|
+  = f.hidden_field :date
+
+  -# Mood & Sleep
+  .grid.grid-cols-2.gap-4
+    %div
+      = f.label :mood, "Humeur", class: "block text-sm font-medium text-gray-300 mb-2"
+      .flex.gap-2
+        - DailyJournal::MOOD_EMOJIS.each do |val, emoji|
+          %label.cursor-pointer
+            = f.radio_button :mood, val, class: "hidden peer"
+            %span{ class: "inline-flex items-center justify-center w-10 h-10 rounded-lg text-xl ring-1 ring-gray-700 hover:bg-gray-800 peer-checked:ring-2 peer-checked:ring-indigo-500 #{journal.mood == val ? 'ring-2 ring-indigo-500 bg-gray-800' : 'bg-gray-900'}" }
+              = emoji
+    %div
+      = f.label :sleep_quality, "Qualité du sommeil", class: "block text-sm font-medium text-gray-300 mb-2"
+      .flex.gap-2
+        - (1..5).each do |val|
+          %label.cursor-pointer
+            = f.radio_button :sleep_quality, val, class: "hidden peer"
+            %span{ class: "inline-flex items-center justify-center w-10 h-10 rounded-lg text-sm font-medium ring-1 ring-gray-700 hover:bg-gray-800 peer-checked:ring-2 peer-checked:ring-indigo-500 text-gray-300 #{journal.sleep_quality == val ? 'ring-2 ring-indigo-500 bg-gray-800' : 'bg-gray-900'}" }
+              = val
+
+  -# Sleep hours & Fatigue & Soreness
+  .grid.grid-cols-3.gap-4
+    %div
+      = f.label :sleep_hours, "Heures de sommeil", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.number_field :sleep_hours, step: 0.5, min: 0, max: 24, placeholder: "7.5", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :fatigue, "Fatigue (1-5)", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.select :fatigue, (1..5).map { |n| [n, n] }, { include_blank: "—" }, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :soreness, "Courbatures (1-5)", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.select :soreness, (1..5).map { |n| [n, n] }, { include_blank: "—" }, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  %div
+    = f.label :comment, "Commentaire", class: "block text-sm font-medium text-gray-300 mb-1"
+    = f.text_area :comment, rows: 3, placeholder: "Comment tu te sens aujourd'hui...", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  .flex.items-center.gap-4
+    = f.submit (journal.persisted? ? "Mettre à jour" : "Enregistrer"), class: "rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500 cursor-pointer focus:outline-none"
+    = link_to "Annuler", daily_journals_path, class: "text-sm text-gray-400 hover:text-gray-300"

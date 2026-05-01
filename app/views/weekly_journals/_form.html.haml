@@ -1,0 +1,21 @@
+= form_with(model: journal, url: (journal.persisted? ? weekly_journal_path(week: journal.week_start_date) : weekly_journals_path), method: (journal.persisted? ? :patch : :post), class: "space-y-6") do |f|
+  = f.hidden_field :week_start_date
+
+  .grid.grid-cols-3.gap-4
+    %div
+      = f.label :pleasure, "Plaisir (1-5)", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.select :pleasure, (1..5).map { |n| [n, n] }, { include_blank: "—" }, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :difficulty, "Difficulté (1-5)", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.select :difficulty, (1..5).map { |n| [n, n] }, { include_blank: "—" }, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :fatigue, "Fatigue (1-5)", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.select :fatigue, (1..5).map { |n| [n, n] }, { include_blank: "—" }, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  %div
+    = f.label :comment, "Commentaire", class: "block text-sm font-medium text-gray-300 mb-1"
+    = f.text_area :comment, rows: 4, placeholder: "Bilan de la semaine...", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  .flex.items-center.gap-4
+    = f.submit (journal.persisted? ? "Mettre à jour" : "Enregistrer"), class: "rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500 cursor-pointer focus:outline-none"
+    = link_to "Annuler", weekly_journals_path, class: "text-sm text-gray-400 hover:text-gray-300"

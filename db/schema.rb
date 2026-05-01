@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_30_095834) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_01_152819) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -51,6 +51,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_30_095834) do
     t.index ["activity_id"], name: "index_activity_laps_on_activity_id"
   end
 
+  create_table "daily_journals", force: :cascade do |t|
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.integer "fatigue"
+    t.integer "mood"
+    t.decimal "sleep_hours", precision: 3, scale: 1
+    t.integer "sleep_quality"
+    t.integer "soreness"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "date"], name: "index_daily_journals_on_user_id_and_date", unique: true
+    t.index ["user_id"], name: "index_daily_journals_on_user_id"
+  end
+
   create_table "heart_rate_zones", force: :cascade do |t|
     t.string "color"
     t.datetime "created_at", null: false
@@ -77,6 +92,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_30_095834) do
     t.index ["user_id"], name: "index_pace_zones_on_user_id"
   end
 
+  create_table "user_metrics", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "metric_type", null: false
+    t.text "notes"
+    t.date "recorded_on", null: false
+    t.string "unit", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.decimal "value", precision: 8, scale: 2, null: false
+    t.index ["user_id", "metric_type", "recorded_on"], name: "index_user_metrics_on_user_id_and_metric_type_and_recorded_on"
+    t.index ["user_id"], name: "index_user_metrics_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.boolean "admin", default: false, null: false
     t.datetime "created_at", null: false
@@ -100,8 +128,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_30_095834) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "weekly_journals", force: :cascade do |t|
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.integer "difficulty"
+    t.integer "fatigue"
+    t.integer "pleasure"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.date "week_start_date", null: false
+    t.index ["user_id", "week_start_date"], name: "index_weekly_journals_on_user_id_and_week_start_date", unique: true
+    t.index ["user_id"], name: "index_weekly_journals_on_user_id"
+  end
+
   add_foreign_key "activities", "users"
   add_foreign_key "activity_laps", "activities"
+  add_foreign_key "daily_journals", "users"
   add_foreign_key "heart_rate_zones", "users"
   add_foreign_key "pace_zones", "users"
+  add_foreign_key "user_metrics", "users"
+  add_foreign_key "weekly_journals", "users"
 end
