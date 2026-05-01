@@ -1,0 +1,15 @@
+= turbo_frame_tag dom_id(@zone) do
+  %tr.border-b.border-gray-800
+    = form_with(model: @zone, url: settings_pace_zone_path(@zone), method: :patch, class: "contents") do |f|
+      %td.px-5.py-2.text-gray-400= "Z#{@zone.zone_number}"
+      %td.px-5.py-2
+        = f.text_field :name, class: "w-full rounded border border-gray-700 bg-gray-800 px-2 py-1 text-sm text-gray-100 focus:border-indigo-500 focus:outline-none"
+      %td.px-5.py-2
+        = f.number_field :max_pace_seconds_per_km, class: "w-20 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-sm text-gray-100 focus:border-indigo-500 focus:outline-none"
+      %td.px-5.py-2
+        = f.number_field :min_pace_seconds_per_km, class: "w-20 rounded border border-gray-700 bg-gray-800 px-2 py-1 text-sm text-gray-100 focus:border-indigo-500 focus:outline-none"
+      %td.px-5.py-2
+        = f.color_field :color, class: "h-8 w-8 rounded cursor-pointer border-0 bg-transparent"
+      %td.px-5.py-2.flex.gap-2
+        = f.submit "OK", class: "rounded bg-indigo-600 px-3 py-1 text-xs text-white hover:bg-indigo-500 cursor-pointer"
+        = link_to "✕", settings_pace_zones_path, class: "rounded bg-gray-700 px-3 py-1 text-xs text-gray-300 hover:bg-gray-600"

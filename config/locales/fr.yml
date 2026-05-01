@@ -36,3 +36,44 @@ fr:
     failure:
       invalid: "Email ou mot de passe invalide."
       unauthenticated: "Tu dois te connecter pour accéder à cette page."
+  sports:
+    running: "Course à pied"
+    cycling: "Vélo"
+    walking: "Marche"
+    swimming: "Natation"
+    ppg: "PPG"
+  feelings:
+    terrible: "Terrible"
+    bad: "Mauvais"
+    ok: "Correct"
+    good: "Bien"
+    great: "Super"
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      short: "%d %b"
+      long: "%A %d %B %Y"
+    day_names: [ Dimanche, Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi ]
+    abbr_day_names: [ Dim, Lun, Mar, Mer, Jeu, Ven, Sam ]
+    month_names:
+      [
+        ~,
+        Janvier,
+        Février,
+        Mars,
+        Avril,
+        Mai,
+        Juin,
+        Juillet,
+        Août,
+        Septembre,
+        Octobre,
+        Novembre,
+        Décembre,
+      ]
+    abbr_month_names: [ ~, Jan, Fév, Mar, Avr, Mai, Jun, Jul, Aoû, Sep, Oct, Nov, Déc ]
+  time:
+    formats:
+      default: "%d/%m/%Y %H:%M"
+      short: "%d %b %H:%M"
+      long: "%A %d %B %Y à %H:%M"

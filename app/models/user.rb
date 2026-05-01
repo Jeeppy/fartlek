@@ -5,6 +5,8 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable, :trackable
 
   has_many :activities, dependent: :destroy
+  has_many :heart_rate_zones, dependent: :destroy
+  has_many :pace_zones, dependent: :destroy
 
   # ─── Enums ────────────────────────────────────────────
   enum :gender, { male: 0, female: 1, other: 2 }
@@ -32,6 +34,12 @@ class User < ApplicationRecord
 
   def admin?
     admin
+  end
+
+  def estimated_max_hr
+    return 190 unless age
+
+    220 - age
   end
 
   private

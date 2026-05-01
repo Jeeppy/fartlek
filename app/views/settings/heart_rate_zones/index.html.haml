@@ -1,0 +1,37 @@
+- content_for(:title) { "Zones de fréquence cardiaque" }
+
+.space-y-6
+  .flex.items-center.justify-between
+    %h1.text-2xl.font-bold.text-gray-100 Zones de fréquence cardiaque
+    .flex.items-center.gap-3
+      %span.text-sm.text-gray-400
+        FC max estimée : #{current_user.estimated_max_hr} bpm
+      = button_to "Générer les zones", settings_generate_heart_rate_zones_path, method: :post, class: "rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 cursor-pointer"
+
+  - if @zones.any?
+    .rounded-lg.bg-gray-900.ring-1.ring-gray-800.overflow-hidden
+      %table.w-full.text-sm
+        %thead
+          %tr.border-b.border-gray-800.text-left.text-xs.text-gray-500
+            %th.px-5.py-3 Zone
+            %th.px-5.py-3 Nom
+            %th.px-5.py-3 Min (bpm)
+            %th.px-5.py-3 Max (bpm)
+            %th.px-5.py-3 Couleur
+            %th.px-5.py-3
+        %tbody
+          - @zones.each do |zone|
+            = turbo_frame_tag dom_id(zone) do
+              %tr.border-b.border-gray-800
+                %td.px-5.py-3.text-gray-400= "Z#{zone.zone_number}"
+                %td.px-5.py-3.text-gray-100= zone.name
+                %td.px-5.py-3.text-gray-300= zone.min_bpm
+                %td.px-5.py-3.text-gray-300= zone.max_bpm
+                %td.px-5.py-3
+                  %span.inline-block.h-4.w-4.rounded-full{ style: "background-color: #{zone.color}" }
+                %td.px-5.py-3
+                  = link_to "Modifier", edit_settings_heart_rate_zone_path(zone), data: { turbo_frame: dom_id(zone) }, class: "text-indigo-400 hover:text-indigo-300 text-xs"
+  - else
+    .rounded-lg.bg-gray-900.px-6.py-12.text-center.ring-1.ring-gray-800
+      %p.text-gray-400 Aucune zone définie.
+      %p.text-sm.text-gray-500.mt-2 Clique sur "Générer les zones" pour créer les zones par défaut basées sur ta FC max estimée.

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_30_090034) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_30_095834) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -51,6 +51,32 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_30_090034) do
     t.index ["activity_id"], name: "index_activity_laps_on_activity_id"
   end
 
+  create_table "heart_rate_zones", force: :cascade do |t|
+    t.string "color"
+    t.datetime "created_at", null: false
+    t.integer "max_bpm", null: false
+    t.integer "min_bpm", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.integer "zone_number", null: false
+    t.index ["user_id", "zone_number"], name: "index_heart_rate_zones_on_user_id_and_zone_number", unique: true
+    t.index ["user_id"], name: "index_heart_rate_zones_on_user_id"
+  end
+
+  create_table "pace_zones", force: :cascade do |t|
+    t.string "color"
+    t.datetime "created_at", null: false
+    t.integer "max_pace_seconds_per_km", null: false
+    t.integer "min_pace_seconds_per_km", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.integer "zone_number", null: false
+    t.index ["user_id", "zone_number"], name: "index_pace_zones_on_user_id_and_zone_number", unique: true
+    t.index ["user_id"], name: "index_pace_zones_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.boolean "admin", default: false, null: false
     t.datetime "created_at", null: false
@@ -76,4 +102,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_30_090034) do
 
   add_foreign_key "activities", "users"
   add_foreign_key "activity_laps", "activities"
+  add_foreign_key "heart_rate_zones", "users"
+  add_foreign_key "pace_zones", "users"
 end
