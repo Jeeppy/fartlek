@@ -1,0 +1,11 @@
+{
+  "token_type": "Bearer",
+  "access_token": "new_access_token_abc123",
+  "refresh_token": "new_refresh_token_def456",
+  "expires_at": 1748700000,
+  "athlete": {
+    "id": 12345678,
+    "firstname": "Jean",
+    "lastname": "Dupont"
+  }
+}

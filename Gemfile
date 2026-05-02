@@ -79,3 +79,5 @@ end
 gem "haml-rails", "~> 3.0"
 
 gem "haml_lint", "~> 0.73.0", groups: [:development, :test], require: false
+
+gem "pry", "~> 0.16.0"

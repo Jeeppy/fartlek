@@ -18,10 +18,19 @@ Rails.application.routes.draw do
   end
   resources :weeks, only: [:show], param: :date, controller: "weeks"
 
+  namespace :strava do
+    get "callback", to: "callbacks#create"
+    post "webhooks", to: "webhooks#create"
+    get "webhooks", to: "webhooks#verify", as: :webhooks_verify
+  end
+
   namespace :settings do
     resource :profile, only: [:show, :edit, :update]
     resources :heart_rate_zones, only: [:index, :update, :edit]
     resources :pace_zones, only: [:index, :update, :edit]
+    resource :strava, only: [:show, :destroy], controller: "strava" do
+      post :sync
+    end
     post "heart_rate_zones/generate", to: "heart_rate_zones#generate", as: :generate_heart_rate_zones
     post "pace_zones/generate", to: "pace_zones#generate", as: :generate_pace_zones
   end

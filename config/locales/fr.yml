@@ -2,6 +2,16 @@
 fr:
   activerecord:
     errors:
+      messages:
+        blank: "doit être rempli(e)"
+        taken: "est déjà utilisé(e)"
+        invalid: "n'est pas valide"
+        too_short: "est trop court (minimum %{count} caractères)"
+        too_long: "est trop long (maximum %{count} caractères)"
+        not_a_number: "n'est pas un nombre"
+        greater_than: "doit être supérieur à %{count}"
+        less_than: "doit être inférieur à %{count}"
+        record_invalid: "La validation a échoué : %{errors}"
       models:
         user:
           attributes:

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_01_152819) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_01_155940) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -92,6 +92,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_152819) do
     t.index ["user_id"], name: "index_pace_zones_on_user_id"
   end
 
+  create_table "strava_credentials", force: :cascade do |t|
+    t.string "access_token", null: false
+    t.datetime "created_at", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "last_sync_at"
+    t.string "refresh_token", null: false
+    t.bigint "strava_athlete_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_strava_credentials_on_user_id", unique: true
+  end
+
   create_table "user_metrics", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "metric_type", null: false
@@ -146,6 +158,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_152819) do
   add_foreign_key "daily_journals", "users"
   add_foreign_key "heart_rate_zones", "users"
   add_foreign_key "pace_zones", "users"
+  add_foreign_key "strava_credentials", "users"
   add_foreign_key "user_metrics", "users"
   add_foreign_key "weekly_journals", "users"
 end
