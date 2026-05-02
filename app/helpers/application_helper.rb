@@ -47,4 +47,12 @@ module ApplicationHelper
     html << "</nav>"
     html.html_safe
   end
+
+  def format_duration(seconds)
+    return "0h00" unless seconds&.positive?
+
+    hours = seconds / 3600
+    minutes = (seconds % 3600) / 60
+    format("%<h>dh%<m>02d", h: hours, m: minutes)
+  end
 end
