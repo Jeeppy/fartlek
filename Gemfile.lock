@@ -479,6 +479,7 @@ DEPENDENCIES
   connection_pool (~> 2.4)
   debug
   devise (~> 4.9)
+  dotenv (~> 3.2)
   factory_bot_rails (~> 6.4)
   faker (~> 3.5)
   faraday (~> 2.12)

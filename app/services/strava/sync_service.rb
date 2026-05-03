@@ -2,6 +2,9 @@
 
 module Strava
   class SyncService
+    MAX_PAGES = 10
+    PER_PAGE = 100
+
     attr_reader :credential
 
     def initialize(user)
@@ -10,8 +13,21 @@ module Strava
 
     def call
       credential.refresh_if_expired!
-      fetch_activities.each { |data| import_activity(data) }
+      page = 1
+
+      loop do
+        activities = fetch_activities(page)
+        break if activities.empty? || page > MAX_PAGES
+
+        activities.each { |data| import_activity(data) }
+        break if activities.size < PER_PAGE
+
+        page += 1
+      end
       credential.update!(last_sync_at: Time.current)
+    rescue Strava::Client::RateLimitError
+      Rails.logger.warn("Strava rate limit hit. Retrying in 15 minutes.")
+      StravaSyncJob.set(wait: 15.minutes).perform_later(credential.user_id)
     end
 
     private
@@ -20,8 +36,10 @@ module Strava
       @client ||= Strava::Client.new(credential)
     end
 
-    def fetch_activities
-      client.activities(per_page: 30, after: credential.last_sync_at.to_i)
+    def fetch_activities(page)
+      params = { per_page: PER_PAGE, page: page }
+      params[:after] = credential.last_sync_at.to_i if credential.last_sync_at
+      client.activities(params)
     end
 
     def import_activity(data)
@@ -40,9 +58,7 @@ module Strava
     def create_laps(activity, laps)
       return if laps.nil?
 
-      laps.each do |lap_data|
-        activity.activity_laps.create!(lap_data)
-      end
+      laps.each { |lap_data| activity.activity_laps.create!(lap_data) }
     end
   end
 end

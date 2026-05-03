@@ -1,0 +1,41 @@
+= form_with(model: equipment, url: (equipment.persisted? ? equipment_path(equipment) : equipment_index_path), class: "space-y-6") do |f|
+  .grid.grid-cols-2.gap-4
+    %div
+      = f.label :name, "Nom", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.text_field :name, placeholder: "Nike Pegasus 41", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :equipment_type, "Type", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.select :equipment_type, Equipment.equipment_types.keys.map { |t| [I18n.t("equipment_types.#{t}", default: t.humanize), t] }, {}, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  .grid.grid-cols-2.gap-4
+    %div
+      = f.label :brand, "Marque", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.text_field :brand, placeholder: "Nike", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :model, "Modèle", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.text_field :model, placeholder: "Pegasus 41", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  .grid.grid-cols-3.gap-4
+    %div
+      = f.label :purchase_date, "Date d'achat", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.date_field :purchase_date, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :initial_distance_meters, "Km initiaux (m)", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.number_field :initial_distance_meters, min: 0, placeholder: "0", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :max_distance_meters, "Durée de vie (m)", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.number_field :max_distance_meters, min: 0, placeholder: "800000", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  - if equipment.persisted?
+    %div
+      = f.label :retired, class: "flex items-center gap-2 cursor-pointer" do
+        = f.check_box :retired, class: "h-4 w-4 rounded border-gray-600 bg-gray-800 text-indigo-500 focus:ring-indigo-500"
+        %span.text-sm.text-gray-300 Retiré (plus utilisé)
+
+  %div
+    = f.label :notes, "Notes", class: "block text-sm font-medium text-gray-300 mb-1"
+    = f.text_area :notes, rows: 2, placeholder: "Remarques...", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  .flex.items-center.gap-4
+    = f.submit (equipment.persisted? ? "Mettre à jour" : "Ajouter"), class: "rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500 cursor-pointer focus:outline-none"
+    = link_to "Annuler", equipment_index_path, class: "text-sm text-gray-400 hover:text-gray-300"

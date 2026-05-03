@@ -2,6 +2,7 @@
 
 class Activity < ApplicationRecord
   belongs_to :user
+  belongs_to :equipment, optional: true
   has_many :activity_laps, dependent: :destroy
 
   # ─── Enums ────────────────────────────────────────────

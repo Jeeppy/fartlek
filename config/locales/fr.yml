@@ -46,6 +46,10 @@ fr:
     failure:
       invalid: "Email ou mot de passe invalide."
       unauthenticated: "Tu dois te connecter pour accéder à cette page."
+  equipment_types:
+    shoes: "Chaussures"
+    bike: "Vélo"
+    other: "Autre"
   sports:
     running: "Course à pied"
     cycling: "Vélo"

@@ -58,7 +58,9 @@ class ActivitiesController < ApplicationController
       :distance_meters, :elevation_gain_meters,
       :average_heart_rate, :max_heart_rate,
       :average_pace_seconds_per_km, :calories,
-      :rpe, :feeling, :notes
+      :rpe, :feeling, :notes,
+      :average_cadence, :average_power,
+      :equipment_id
     )
   end
 end

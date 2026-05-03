@@ -10,18 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_01_155940) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_02_194312) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "activities", force: :cascade do |t|
+    t.integer "average_cadence"
     t.integer "average_heart_rate"
     t.integer "average_pace_seconds_per_km"
+    t.integer "average_power"
     t.integer "calories"
     t.datetime "created_at", null: false
     t.integer "distance_meters"
     t.integer "duration_seconds"
     t.integer "elevation_gain_meters"
+    t.bigint "equipment_id"
     t.integer "feeling"
     t.integer "max_heart_rate"
     t.text "notes"
@@ -33,6 +36,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_155940) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["equipment_id"], name: "index_activities_on_equipment_id"
     t.index ["strava_id"], name: "index_activities_on_strava_id", unique: true
     t.index ["user_id", "performed_at"], name: "index_activities_on_user_id_and_performed_at"
     t.index ["user_id"], name: "index_activities_on_user_id"
@@ -40,8 +44,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_155940) do
 
   create_table "activity_laps", force: :cascade do |t|
     t.bigint "activity_id", null: false
+    t.integer "average_cadence"
     t.integer "average_heart_rate"
     t.integer "average_pace_seconds_per_km"
+    t.integer "average_power"
     t.datetime "created_at", null: false
     t.integer "distance_meters"
     t.integer "duration_seconds"
@@ -64,6 +70,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_155940) do
     t.bigint "user_id", null: false
     t.index ["user_id", "date"], name: "index_daily_journals_on_user_id_and_date", unique: true
     t.index ["user_id"], name: "index_daily_journals_on_user_id"
+  end
+
+  create_table "equipment", force: :cascade do |t|
+    t.string "brand"
+    t.datetime "created_at", null: false
+    t.integer "equipment_type", default: 0, null: false
+    t.integer "initial_distance_meters", default: 0
+    t.integer "max_distance_meters"
+    t.string "model"
+    t.string "name", null: false
+    t.text "notes"
+    t.date "purchase_date"
+    t.boolean "retired", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_equipment_on_user_id"
   end
 
   create_table "heart_rate_zones", force: :cascade do |t|
@@ -153,9 +175,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_01_155940) do
     t.index ["user_id"], name: "index_weekly_journals_on_user_id"
   end
 
+  add_foreign_key "activities", "equipment"
   add_foreign_key "activities", "users"
   add_foreign_key "activity_laps", "activities"
   add_foreign_key "daily_journals", "users"
+  add_foreign_key "equipment", "users"
   add_foreign_key "heart_rate_zones", "users"
   add_foreign_key "pace_zones", "users"
   add_foreign_key "strava_credentials", "users"

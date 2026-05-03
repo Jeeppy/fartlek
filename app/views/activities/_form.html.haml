@@ -37,6 +37,15 @@
       = f.label :max_heart_rate, "FC max", class: "block text-sm font-medium text-gray-300 mb-1"
       = f.number_field :max_heart_rate, min: 30, max: 250, placeholder: "175", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
 
+  -# Cadence + Puissance
+  .grid.grid-cols-2.gap-4
+    %div
+      = f.label :average_cadence, "Cadence (spm)", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.number_field :average_cadence, min: 0, placeholder: "180", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :average_power, "Puissance (W)", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.number_field :average_power, min: 0, placeholder: "250", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
   -# Allure + Calories
   .grid.grid-cols-2.gap-4
     %div
@@ -56,6 +65,11 @@
     %div
       = f.label :feeling, "Ressenti", class: "block text-sm font-medium text-gray-300 mb-1"
       = f.select :feeling, Activity.feelings.keys.map { |fe| [I18n.t("feelings.#{fe}", default: fe.humanize), fe] }, { include_blank: "—" }, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  -# Équipement
+  %div
+    = f.label :equipment_id, "Équipement", class: "block text-sm font-medium text-gray-300 mb-1"
+    = f.select :equipment_id, current_user.equipments.active.ordered.map { |e| [e.name, e.id] }, { include_blank: "— Aucun —" }, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
 
   -# Notes
   %div

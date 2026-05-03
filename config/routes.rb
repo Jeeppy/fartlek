@@ -17,6 +17,7 @@ Rails.application.routes.draw do
                         constraints: { year: /\d{4}/, month: /\d{1,2}/ }
   end
   resources :weeks, only: [:show], param: :date, controller: "weeks"
+  resources :equipment
 
   namespace :strava do
     get "callback", to: "callbacks#create"

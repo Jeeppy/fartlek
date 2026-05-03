@@ -9,6 +9,9 @@
     = csp_meta_tag
     = stylesheet_link_tag "tailwind", "data-turbo-track": "reload"
     = stylesheet_link_tag "application", "data-turbo-track": "reload"
+    %script{ src: "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" }
+    %script{ src: "https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" }
+    %script{ src: "https://cdn.jsdelivr.net/npm/chartkick@5.0.1/dist/chartkick.min.js" }
     = javascript_importmap_tags
 
   %body.h-full.bg-gray-950.text-gray-100

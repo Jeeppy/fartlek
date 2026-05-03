@@ -34,3 +34,13 @@
           %span.text-gray-500 FC
           %br
           %span.font-medium= "#{activity.average_heart_rate} bpm"
+      - if activity.average_cadence
+        %div
+          %span.text-gray-500 Cad
+          %br
+          %span.font-medium= "#{activity.average_cadence} spm"
+      - if activity.average_power
+        %div
+          %span.text-gray-500 Puiss
+          %br
+          %span.font-medium= "#{activity.average_power} W"

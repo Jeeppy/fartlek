@@ -12,25 +12,25 @@
     = render "stat_card", icon: "⏱️", label: "Durée totale", value: format_duration(@volume[:current][:duration_seconds])
     = render "stat_card", icon: "🔥", label: "Streak", value: "#{@streak} jour(s)"
 
-  -# Volume comparison
-  .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
-    %h2.text-sm.font-medium.text-gray-400.mb-4 Comparaison avec N-1 (mois)
-    .grid.grid-cols-3.gap-4
-      = render "delta_card", label: "Distance", value: "#{@volume[:delta][:distance_km]}%", positive: @volume[:delta][:distance_km] >= 0
-      = render "delta_card", label: "Durée", value: "#{@volume[:delta][:duration]}%", positive: @volume[:delta][:duration] >= 0
-      = render "delta_card", label: "Séances", value: "#{@volume[:delta][:count] >= 0 ? '+' : ''}#{@volume[:delta][:count]}", positive: @volume[:delta][:count] >= 0
+  .grid.grid-cols-2.gap-4
+    -# Comparaison N-1
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+      %h2.text-sm.font-medium.text-gray-400.mb-4 Comparaison N-1 (mois)
+      .grid.grid-cols-3.gap-4
+        = render "delta_card", label: "Distance", value: "#{@volume[:delta][:distance_km]}%", positive: @volume[:delta][:distance_km] >= 0
+        = render "delta_card", label: "Durée", value: "#{@volume[:delta][:duration]}%", positive: @volume[:delta][:duration] >= 0
+        = render "delta_card", label: "Séances", value: "#{@volume[:delta][:count] >= 0 ? '+' : ''}#{@volume[:delta][:count]}", positive: @volume[:delta][:count] >= 0
 
-  -# Weekly summary
-  .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
-    %h2.text-sm.font-medium.text-gray-400.mb-4 Cette semaine
-    - if @weekly[:current][:count] > 0
-      .grid.grid-cols-2.gap-4{ class: "sm:grid-cols-4" }
-        = render "stat_mini", label: "Séances", value: @weekly[:current][:count]
-        = render "stat_mini", label: "Distance", value: "#{@weekly[:current][:distance_km]} km"
-        = render "stat_mini", label: "Durée", value: format_duration(@weekly[:current][:duration_seconds])
-        = render "stat_mini", label: "D+", value: "#{@weekly[:current][:elevation]} m"
-    - else
-      %p.text-gray-500.text-sm Aucune activité cette semaine.
+    -# Cette semaine
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+      %h2.text-sm.font-medium.text-gray-400.mb-4 Cette semaine
+      - if @weekly[:current][:count] > 0
+        .grid.grid-cols-2.gap-{ class: "sm:grid-cols-3" }
+          = render "stat_mini", label: "Séances", value: @weekly[:current][:count]
+          = render "stat_mini", label: "Distance", value: "#{@weekly[:current][:distance_km]} km"
+          = render "stat_mini", label: "Durée", value: format_duration(@weekly[:current][:duration_seconds])
+      - else
+        %p.text-gray-500.text-sm Aucune activité cette semaine.
 
   -# Training load chart (TSB)
   .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
@@ -39,8 +39,8 @@
       .grid.grid-cols-3.gap-4.mb-4
         = render "stat_mini", label: "Fitness (CTL)", value: @fitness.last[:ctl]
         = render "stat_mini", label: "Fatigue (ATL)", value: @fitness.last[:atl]
-        = render "stat_mini", label: "Forme (TSB)", value: @fitness.last[:tsb]
-      .h-48
-        = line_chart @fitness.map { |f| [f[:date], f[:tsb]] }, colors: ["#818cf8"], library: { scales: { y: { grid: { color: "#1f2937" } }, x: { grid: { color: "#1f2937" } } } }
+        = render "stat_mini", label: "Forme (TSB)", value: @fitness.last[:tsb].round(1)
+      .h-64.overflow-hidden
+        = line_chart @fitness.map { |f| [f[:date], f[:tsb]] }, colors: ["#818cf8"], height: "250px"
     - else
       %p.text-gray-500.text-sm Pas assez de données pour calculer la charge.

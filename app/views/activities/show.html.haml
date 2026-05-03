@@ -21,6 +21,8 @@
     - stats << { label: "D+", value: "#{@activity.elevation_gain_meters} m" } if @activity.elevation_gain_meters
     - stats << { label: "FC moy", value: "#{@activity.average_heart_rate} bpm" } if @activity.average_heart_rate
     - stats << { label: "FC max", value: "#{@activity.max_heart_rate} bpm" } if @activity.max_heart_rate
+    - stats << { label: "Cadence", value: "#{@activity.average_cadence} spm" } if @activity.average_cadence
+    - stats << { label: "Puissance", value: "#{@activity.average_power} W" } if @activity.average_power
     - stats << { label: "Calories", value: @activity.calories } if @activity.calories
     - stats << { label: "RPE", value: "#{@activity.rpe}/10" } if @activity.rpe
     - stats << { label: "Ressenti", value: @activity.feeling&.humanize } if @activity.feeling
@@ -29,6 +31,15 @@
       .rounded-lg.bg-gray-900.px-4.py-4.ring-1.ring-gray-800
         %dt.text-xs.font-medium.text-gray-500= stat[:label]
         %dd.mt-1.text-lg.font-semibold.text-gray-100= stat[:value]
+
+  -# Équipement
+  - if @activity.equipment
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+      .flex.items-center.gap-3
+        %span.text-xl= @activity.equipment.shoes? ? "👟" : @activity.equipment.bike? ? "🚲" : "🔧"
+        %div
+          %span.text-sm.font-medium.text-gray-100= @activity.equipment.name
+          %span.text-xs.text-gray-400.ml-2= [@activity.equipment.brand, @activity.equipment.model].compact.join(" ")
 
   -# Notes
   - if @activity.notes.present?
@@ -48,6 +59,8 @@
             %th.px-5.py-2 Durée
             %th.px-5.py-2 Allure
             %th.px-5.py-2 FC
+            %th.px-5.py-2 Cad
+            %th.px-5.py-2 Puiss
             %th.px-5.py-2 D+
         %tbody
           - @activity.activity_laps.ordered.each do |lap|
@@ -57,6 +70,8 @@
               %td.px-5.py-2.text-gray-100= lap.duration_seconds ? "#{lap.duration_seconds / 60}:#{format('%02d', lap.duration_seconds % 60)}" : "—"
               %td.px-5.py-2.text-gray-100= lap.pace_formatted || "—"
               %td.px-5.py-2.text-gray-100= lap.average_heart_rate || "—"
+              %td.px-5.py-2.text-gray-100= lap.average_cadence || "—"
+              %td.px-5.py-2.text-gray-100= lap.average_power ? "#{lap.average_power} W" : "—"
               %td.px-5.py-2.text-gray-100= lap.elevation_gain_meters ? "#{lap.elevation_gain_meters} m" : "—"
 
   = link_to "← Retour", activities_path, class: "inline-block text-sm text-gray-400 hover:text-gray-300"
