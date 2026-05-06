@@ -1,0 +1,6 @@
+- if resource.errors.any?
+  .rounded-lg.bg-red-950.p-4.ring-1.ring-red-800.mb-2
+    %h3.text-sm.font-medium.text-red-300= "#{resource.errors.count} erreur(s) :"
+    %ul.mt-2.space-y-1
+      - resource.errors.full_messages.each do |msg|
+        %li.text-xs.text-red-400= msg

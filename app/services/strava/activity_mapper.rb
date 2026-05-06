@@ -33,7 +33,7 @@ module Strava
         elevation_gain_meters: data["total_elevation_gain"]&.positive? ? data["total_elevation_gain"].to_i : nil,
         average_heart_rate: data["average_heartrate"]&.positive? ? data["average_heartrate"].to_i : nil,
         max_heart_rate: data["max_heartrate"]&.positive? ? data["max_heartrate"].to_i : nil,
-        average_cadence: data["average_cadence"]&.to_i&.positive? ? data["average_cadence"].to_i : nil,
+        average_cadence: data["average_cadence"]&.to_i&.positive? ? (data["average_cadence"].to_i * 2) : nil,
         average_power: data["average_watts"]&.to_i&.positive? ? data["average_watts"].to_i : nil,
         calories: data["calories"]&.positive? ? data["calories"].to_i : nil,
         average_pace_seconds_per_km: speed_to_pace(data["average_speed"]),
@@ -57,7 +57,7 @@ module Strava
         {
           average_heart_rate: lap["average_heartrate"],
           average_pace_seconds_per_km: speed_to_pace(lap["average_speed"]),
-          average_cadence: lap["average_cadence"]&.to_i&.positive? ? lap["average_cadence"].to_i : nil,
+          average_cadence: data["average_cadence"]&.to_i&.positive? ? (data["average_cadence"].to_i * 2) : nil,
           average_power: lap["average_watts"]&.to_i&.positive? ? lap["average_watts"].to_i : nil,
           distance_meters: lap["distance"],
           duration_seconds: lap["elapsed_time"],

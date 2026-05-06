@@ -1,0 +1,31 @@
+= form_with(model: phase, class: "space-y-6") do |f|
+  %div
+    = f.label :name, "Nom", class: "block text-sm font-medium text-gray-300 mb-1"
+    = f.text_field :name, placeholder: "Préparation spécifique marathon", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  .grid.grid-cols-3.gap-4
+    %div
+      = f.label :phase_type, "Type", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.select :phase_type, TrainingPhase.phase_types.keys.map { |t| [I18n.t("phase_types.#{t}", default: t.humanize), t] }, {}, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :start_date, "Début", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.date_field :start_date, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :end_date, "Fin", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.date_field :end_date, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  .grid.grid-cols-2.gap-4
+    %div
+      = f.label :color, "Couleur", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.color_field :color, class: "h-10 w-16 rounded cursor-pointer border-0 bg-transparent"
+    %div
+      = f.label :competition_id, "Compétition liée", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.select :competition_id, current_user.competitions.upcoming.map { |c| [c.name, c.id] }, { include_blank: "— Aucune —" }, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  %div
+    = f.label :description, "Description", class: "block text-sm font-medium text-gray-300 mb-1"
+    = f.text_area :description, rows: 3, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  .flex.items-center.gap-4
+    = f.submit (phase.persisted? ? "Mettre à jour" : "Créer"), class: "rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500 cursor-pointer focus:outline-none"
+    = link_to "Annuler", training_phases_path, class: "text-sm text-gray-400 hover:text-gray-300"

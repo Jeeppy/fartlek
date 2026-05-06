@@ -18,6 +18,20 @@ Rails.application.routes.draw do
   end
   resources :weeks, only: [:show], param: :date, controller: "weeks"
   resources :equipment
+  resources :competitions
+  resources :training_phases
+
+  resources :activity_tags, only: [:index] do
+    collection do
+      post :generate
+    end
+  end
+
+  resources :planned_sessions, except: [:index] do
+    member do
+      patch :complete
+    end
+  end
 
   namespace :strava do
     get "callback", to: "callbacks#create"
@@ -36,6 +50,11 @@ Rails.application.routes.draw do
     post "pace_zones/generate", to: "pace_zones#generate", as: :generate_pace_zones
   end
 
+  namespace :ai do
+    resources :analyses, only: [:create]
+    resource :planning, only: [:show, :create, :destroy]
+  end
+
   resources :user_metrics
   resources :daily_journals, param: :date
   resources :weekly_journals, param: :week
@@ -43,7 +62,13 @@ Rails.application.routes.draw do
   resources :activities do
     member do
       patch :update_rpe
+      get :export_json
     end
+  end
+
+  namespace :export do
+    resources :activities, only: [:index]
+    resources :weeks, only: [:show], param: :date
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

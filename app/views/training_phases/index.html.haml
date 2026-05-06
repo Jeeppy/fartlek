@@ -1,0 +1,28 @@
+- content_for(:title) { "Phases d'entraînement" }
+
+.space-y-6
+  .flex.items-center.justify-between
+    %h1.text-2xl.font-bold.text-gray-100 Phases d'entraînement
+    = link_to new_training_phase_path, class: "rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500" do
+      + Ajouter
+
+  - if @phases.any?
+    .space-y-3
+      - @phases.each do |phase|
+        .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+          .flex.items-center.justify-between
+            .flex.items-center.gap-4
+              %span.h-4.w-4.rounded-full{ style: "background-color: #{phase.color}" }
+              %div
+                %h3.text-sm.font-semibold.text-gray-100= phase.name
+                .flex.items-center.gap-2.mt-1
+                  %span.text-xs.text-gray-400= "#{l(phase.start_date, format: '%d %b')} → #{l(phase.end_date, format: '%d %b %Y')}"
+                  %span.text-xs.text-gray-500= "(#{phase.duration_days} jours)"
+                  - if phase.competition
+                    %span.text-xs.text-indigo-400= "→ #{phase.competition.name}"
+            .flex.items-center.gap-3
+              = link_to "Modifier", edit_training_phase_path(phase), class: "text-indigo-400 hover:text-indigo-300 text-xs"
+              = link_to "Suppr.", training_phase_path(phase), data: { turbo_method: :delete, turbo_confirm: "Supprimer ?" }, class: "text-red-400 hover:text-red-300 text-xs"
+  - else
+    .rounded-lg.bg-gray-900.px-6.py-12.text-center.ring-1.ring-gray-800
+      %p.text-gray-400 Aucune phase définie.

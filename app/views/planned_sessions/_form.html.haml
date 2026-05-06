@@ -1,0 +1,62 @@
+= form_with(model: planned_session, class: "space-y-8") do |f|
+  = render "shared/form_errors", resource: planned_session
+
+  -# Titre + Sport
+  %fieldset
+    %legend.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.mb-3 Séance
+    .grid.grid-cols-2.gap-6
+      %div
+        = f.label :title, "Titre", class: "block text-sm font-medium text-gray-300 mb-2"
+        = f.text_field :title, placeholder: "Ex: Fractionné 10x400m", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+      %div
+        = f.label :sport, "Sport", class: "block text-sm font-medium text-gray-300 mb-2"
+        = f.select :sport, PlannedSession.sports.keys.map { |s| [I18n.t("sports.#{s}", default: s.humanize), s] }, {}, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  -# Objectifs
+  %fieldset
+    %legend.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.mb-3 Objectifs
+    .grid.grid-cols-2.gap-6
+      %div
+        = f.label :date, "Date", class: "block text-sm font-medium text-gray-300 mb-2"
+        = f.date_field :date, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+      %div{ data: { controller: "duration" } }
+        %label.block.text-sm.font-medium.text-gray-300.mb-2 Durée cible
+        .flex.items-center.gap-3
+          = f.hidden_field :target_duration_seconds, data: { duration_target: "hidden" }
+          = number_field_tag :duration_hours, nil, min: 0, max: 10, placeholder: "—", data: { duration_target: "hours", action: "input->duration#update" }, class: "block w-20 rounded-lg border border-gray-700 bg-gray-800 px-3 py-3 text-gray-100 text-sm text-center focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+          %span.text-sm.text-gray-400 h
+          = number_field_tag :duration_minutes, nil, min: 0, max: 59, placeholder: "—", data: { duration_target: "minutes", action: "input->duration#update" }, class: "block w-20 rounded-lg border border-gray-700 bg-gray-800 px-3 py-3 text-gray-100 text-sm text-center focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+          %span.text-sm.text-gray-400 min
+
+    .grid.grid-cols-2.gap-6.mt-4
+      %div
+        = f.label :target_distance_meters, "Distance cible", class: "block text-sm font-medium text-gray-300 mb-2"
+        .flex.items-center.gap-2
+          = f.hidden_field :target_distance_meters
+          = number_field_tag :distance_km, planned_session.target_distance_meters ? (planned_session.target_distance_meters / 1000.0).round(1) : nil, min: 0, step: 0.1, placeholder: "—", onchange: "this.previousElementSibling.value = Math.round(this.value * 1000)", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+          %span.text-sm.text-gray-400 km
+      %div{ data: { controller: "pace" } }
+        %label.block.text-sm.font-medium.text-gray-300.mb-2 Allure cible
+        .flex.items-center.gap-2
+          = f.hidden_field :target_pace_seconds_per_km, data: { pace_target: "hidden" }
+          = number_field_tag :pace_minutes, nil, min: 0, max: 20, placeholder: "—", data: { pace_target: "minutes", action: "input->pace#update" }, class: "block w-20 rounded-lg border border-gray-700 bg-gray-800 px-3 py-3 text-gray-100 text-sm text-center focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+          %span.text-sm.text-gray-400 min
+          = number_field_tag :pace_seconds, nil, min: 0, max: 59, placeholder: "—", data: { pace_target: "seconds", action: "input->pace#update" }, class: "block w-20 rounded-lg border border-gray-700 bg-gray-800 px-3 py-3 text-gray-100 text-sm text-center focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+          %span.text-sm.text-gray-400 /km
+
+  -# Intensité
+  %fieldset
+    %legend.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.mb-3 Intensité
+    %div{ data: { controller: "rpe-slider" } }
+      = f.range_field :target_rpe, min: 1, max: 10, step: 1, value: planned_session.target_rpe || 5, class: "w-full accent-indigo-500", data: { action: "input->rpe-slider#update", rpe_slider_target: "slider" }
+      .mt-2.text-center.text-sm.font-semibold{ data: { rpe_slider_target: "value" } }
+
+  -# Détail
+  %fieldset
+    %legend.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.mb-3 Détail
+    = f.text_area :description, rows: 6, placeholder: "Échauffement 20min\n10x400m R1'30\nRetour au calme 10min", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  -# Actions
+  .flex.items-center.gap-4.pt-2
+    = f.submit (planned_session.persisted? ? "Mettre à jour" : "Planifier"), class: "rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500 cursor-pointer focus:outline-none"
+    = link_to "Annuler", week_path(date: planned_session.date&.beginning_of_week || Date.current.beginning_of_week), class: "text-sm text-gray-400 hover:text-gray-300"

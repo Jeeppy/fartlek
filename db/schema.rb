@@ -10,11 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_02_194312) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_06_072747) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "activities", force: :cascade do |t|
+    t.text "ai_analysis"
+    t.datetime "ai_analyzed_at"
     t.integer "average_cadence"
     t.integer "average_heart_rate"
     t.integer "average_pace_seconds_per_km"
@@ -55,6 +57,59 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_02_194312) do
     t.integer "lap_number", null: false
     t.datetime "updated_at", null: false
     t.index ["activity_id"], name: "index_activity_laps_on_activity_id"
+  end
+
+  create_table "activity_taggings", force: :cascade do |t|
+    t.bigint "activity_id", null: false
+    t.bigint "activity_tag_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["activity_id", "activity_tag_id"], name: "index_activity_taggings_on_activity_id_and_activity_tag_id", unique: true
+    t.index ["activity_id"], name: "index_activity_taggings_on_activity_id"
+    t.index ["activity_tag_id"], name: "index_activity_taggings_on_activity_tag_id"
+  end
+
+  create_table "activity_tags", force: :cascade do |t|
+    t.string "color", default: "#6366f1", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "name"], name: "index_activity_tags_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_activity_tags_on_user_id"
+  end
+
+  create_table "ai_conversations", force: :cascade do |t|
+    t.integer "conversation_type", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.jsonb "messages", default: [], null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.date "week_start_date"
+    t.index ["user_id", "conversation_type", "week_start_date"], name: "idx_ai_conversations_unique", unique: true
+    t.index ["user_id"], name: "index_ai_conversations_on_user_id"
+  end
+
+  create_table "competitions", force: :cascade do |t|
+    t.boolean "completed", default: false, null: false
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.string "location"
+    t.string "name", null: false
+    t.text "notes"
+    t.text "objectives"
+    t.integer "priority", default: 0, null: false
+    t.integer "result_pace_seconds_per_km"
+    t.integer "result_position"
+    t.integer "result_time_seconds"
+    t.integer "sport", default: 0, null: false
+    t.integer "target_distance_meters"
+    t.integer "target_pace_seconds_per_km"
+    t.integer "target_time_seconds"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "date"], name: "index_competitions_on_user_id_and_date"
+    t.index ["user_id"], name: "index_competitions_on_user_id"
   end
 
   create_table "daily_journals", force: :cascade do |t|
@@ -114,6 +169,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_02_194312) do
     t.index ["user_id"], name: "index_pace_zones_on_user_id"
   end
 
+  create_table "planned_sessions", force: :cascade do |t|
+    t.bigint "activity_id"
+    t.boolean "completed", default: false, null: false
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.text "description"
+    t.integer "sport", default: 0, null: false
+    t.integer "target_distance_meters"
+    t.integer "target_duration_seconds"
+    t.integer "target_pace_seconds_per_km"
+    t.integer "target_rpe"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["activity_id"], name: "index_planned_sessions_on_activity_id"
+    t.index ["user_id", "date"], name: "index_planned_sessions_on_user_id_and_date"
+    t.index ["user_id"], name: "index_planned_sessions_on_user_id"
+  end
+
   create_table "strava_credentials", force: :cascade do |t|
     t.string "access_token", null: false
     t.datetime "created_at", null: false
@@ -124,6 +198,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_02_194312) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_strava_credentials_on_user_id", unique: true
+  end
+
+  create_table "training_phases", force: :cascade do |t|
+    t.string "color", default: "#6366f1", null: false
+    t.bigint "competition_id"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.date "end_date", null: false
+    t.string "name", null: false
+    t.integer "phase_type", default: 0, null: false
+    t.date "start_date", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["competition_id"], name: "index_training_phases_on_competition_id"
+    t.index ["user_id", "start_date", "end_date"], name: "index_training_phases_on_user_id_and_start_date_and_end_date"
+    t.index ["user_id"], name: "index_training_phases_on_user_id"
   end
 
   create_table "user_metrics", force: :cascade do |t|
@@ -178,11 +268,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_02_194312) do
   add_foreign_key "activities", "equipment"
   add_foreign_key "activities", "users"
   add_foreign_key "activity_laps", "activities"
+  add_foreign_key "activity_taggings", "activities"
+  add_foreign_key "activity_taggings", "activity_tags"
+  add_foreign_key "activity_tags", "users"
+  add_foreign_key "ai_conversations", "users"
+  add_foreign_key "competitions", "users"
   add_foreign_key "daily_journals", "users"
   add_foreign_key "equipment", "users"
   add_foreign_key "heart_rate_zones", "users"
   add_foreign_key "pace_zones", "users"
+  add_foreign_key "planned_sessions", "activities"
+  add_foreign_key "planned_sessions", "users"
   add_foreign_key "strava_credentials", "users"
+  add_foreign_key "training_phases", "competitions"
+  add_foreign_key "training_phases", "users"
   add_foreign_key "user_metrics", "users"
   add_foreign_key "weekly_journals", "users"
 end

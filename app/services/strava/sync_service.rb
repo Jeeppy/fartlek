@@ -53,12 +53,25 @@ module Strava
       laps = mapped.delete(:laps)
       activity = credential.user.activities.create!(mapped)
       create_laps(activity, laps)
+      auto_match_planned(activity)
+      AiActivityAnalysisJob.perform_later(activity.id)
     end
 
     def create_laps(activity, laps)
       return if laps.nil?
 
       laps.each { |lap_data| activity.activity_laps.create!(lap_data) }
+    end
+
+    def auto_match_planned(activity)
+      planned = credential.user.planned_sessions
+                          .where(date: activity.performed_at.to_date, sport: activity.sport, completed: false)
+                          .first
+
+      return unless planned
+
+      planned.update!(activity: activity, completed: true)
+      activity.update!(title: planned.title)
     end
   end
 end

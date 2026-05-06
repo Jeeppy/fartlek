@@ -1,0 +1,47 @@
+- content_for(:title) { "Compétitions" }
+
+.space-y-6
+  .flex.items-center.justify-between
+    %h1.text-2xl.font-bold.text-gray-100 Compétitions
+    = link_to new_competition_path, class: "rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500" do
+      + Ajouter
+
+  - if @upcoming.any?
+    %h2.text-sm.font-medium.text-gray-400 À venir
+    .space-y-3
+      - @upcoming.each do |comp|
+        = link_to competition_path(comp), class: "block rounded-lg bg-gray-900 p-5 ring-1 ring-gray-800 hover:ring-gray-700 transition" do
+          .flex.items-center.justify-between
+            .flex.items-center.gap-4
+              %span.text-2xl= comp.sport_running? ? "🏃" : comp.sport_cycling? ? "🚴" : "🏊"
+              %div
+                .flex.items-center.gap-2
+                  %h3.text-sm.font-semibold.text-gray-100= comp.name
+                  %span{ class: "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium #{comp.principal? ? 'bg-red-950 text-red-300' : 'bg-blue-950 text-blue-300'}" }
+                    = comp.principal? ? "Objectif A" : "Objectif B"
+                .mt-1.text-xs.text-gray-400
+                  = l(comp.date, format: "%A %d %B %Y").capitalize
+                  - if comp.location.present?
+                    = " — #{comp.location}"
+            .text-right
+              %span.text-lg.font-bold.text-indigo-400 J-#{comp.days_until}
+              - if comp.target_distance_meters
+                %p.text-xs.text-gray-500= "#{(comp.target_distance_meters / 1000.0).round(1)} km"
+
+  - if @past.any?
+    %h2.text-sm.font-medium.text-gray-400.mt-8 Passées
+    .space-y-3
+      - @past.each do |comp|
+        = link_to competition_path(comp), class: "block rounded-lg bg-gray-900 p-5 ring-1 ring-gray-800 hover:ring-gray-700 transition opacity-70" do
+          .flex.items-center.justify-between
+            .flex.items-center.gap-4
+              %span.text-2xl= comp.completed? ? "🏅" : "📅"
+              %div
+                %h3.text-sm.font-semibold.text-gray-100= comp.name
+                .text-xs.text-gray-400= l(comp.date, format: "%d %B %Y")
+            - if comp.result_time_seconds
+              %span.text-sm.font-medium.text-gray-300= comp.target_time_formatted
+
+  - if @upcoming.empty? && @past.empty?
+    .rounded-lg.bg-gray-900.px-6.py-12.text-center.ring-1.ring-gray-800
+      %p.text-gray-400 Aucune compétition planifiée.

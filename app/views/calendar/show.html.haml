@@ -2,42 +2,90 @@
 
 = turbo_frame_tag "calendar" do
   .space-y-4
-    -# Header navigation
+    -# Header
     .flex.items-center.justify-between
       = link_to month_calendar_path(@prev_month.year, @prev_month.month), data: { turbo_frame: "calendar" }, class: "rounded-lg bg-gray-900 px-3 py-2 text-sm text-gray-400 ring-1 ring-gray-800 hover:bg-gray-800" do
-        ← Précédent
-
+        ←
       %h2.text-lg.font-semibold.text-gray-100= l(@date, format: "%B %Y").capitalize
-
       = link_to month_calendar_path(@next_month.year, @next_month.month), data: { turbo_frame: "calendar" }, class: "rounded-lg bg-gray-900 px-3 py-2 text-sm text-gray-400 ring-1 ring-gray-800 hover:bg-gray-800" do
-        Suivant →
+        →
 
-    -# Day headers
-    .grid.grid-cols-7.gap-1
-      - %w[Lun Mar Mer Jeu Ven Sam Dim].each do |day|
-        .py-2.text-center.text-xs.font-medium.text-gray-500= day
+    -# Phases + Compétitions
+    - if @phases.any? || @competitions.any?
+      .flex.flex-wrap.gap-2
+        - @phases.each do |phase|
+          %span.rounded.px-2.py-1.text-xs.font-medium.text-gray-100{ style: "background-color: #{phase.color}30; border-left: 3px solid #{phase.color}" }
+            = phase.name
+        - @competitions.each do |comp|
+          %span.rounded.px-2.py-1.text-xs.font-medium.bg-red-950.text-red-300
+            🏁 #{comp.name} — #{l(comp.date, format: "%d/%m")}
 
-    -# Calendar grid
-    .grid.grid-cols-7.gap-1
-      -# Blank cells before first day
-      - start_day = @date.beginning_of_month.cwday - 1
-      - start_day.times do
-        .min-h-24.rounded-lg.bg-gray-950
+    -# Grid
+    .rounded-lg.bg-gray-900.ring-1.ring-gray-800.overflow-hidden
 
-      -# Days of the month
-      - (@date.beginning_of_month..@date.end_of_month).each do |day|
-        - today = day == Date.current
-        - activities = @activities[day] || []
-        .min-h-24.rounded-lg.p-2{ class: today ? "bg-gray-800 ring-1 ring-indigo-500" : "bg-gray-900 ring-1 ring-gray-800" }
-          .flex.items-center.justify-between.mb-1
-            %span.text-xs.font-medium{ class: today ? "text-indigo-400" : "text-gray-400" }= day.day
-            - if activities.any?
-              %span.text-xs.text-gray-500= activities.size
+      -# Day headers
+      .grid.grid-cols-8
+        .px-2.py-2.text-center.text-xs.font-medium.text-gray-600.border-b.border-gray-800
+        - %w[Lun Mar Mer Jeu Ven Sam Dim].each do |day|
+          .px-2.py-2.text-center.text-xs.font-medium.text-gray-500.border-b.border-gray-800= day
 
-          .space-y-1
-            - activities.first(3).each do |activity|
-              = link_to activity_path(activity), data: { turbo_frame: "_top" }, class: "block truncate rounded px-1.5 py-0.5 text-xs hover:bg-gray-700" do
-                %span= activity.sport_icon
-                %span.text-gray-300= activity.distance_km ? "#{activity.distance_km}km" : activity.duration_formatted
-            - if activities.size > 3
-              %span.text-xs.text-gray-500= "+#{activities.size - 3}"
+      -# Weeks
+      - start_date = @date.beginning_of_month.beginning_of_week
+      - end_date = @date.end_of_month.end_of_week
+      - (start_date..end_date).each_slice(7) do |week|
+        - week_start = week.first
+        - summary = @weekly_summaries[week_start]
+        .grid.grid-cols-8.border-b.border-gray-800{ class: "last:border-b-0" }
+
+          -# Mini résumé hebdo
+          .px-2.py-3.border-r.border-gray-800.flex.flex-col.justify-center
+            .text-xs.text-gray-600.font-medium S#{week_start.cweek}
+            - if summary[:count] > 0
+              .text-xs.font-semibold.text-gray-300.mt-1= "#{summary[:km]}km"
+              .text-xs.text-gray-500= "#{summary[:hours]}h · #{summary[:count]}x"
+            - summary[:warnings].each do |w|
+              .text-xs.text-orange-400.mt-1 ⚠
+
+          -# Days
+          - week.each do |day|
+            - in_month = day.month == @date.month
+            - today = day == Date.current
+            - day_activities = @activities[day] || []
+            - day_planned = @planned_sessions[day] || []
+            - intensity = day_intensity(day_activities)
+            - border_class = case intensity
+            - when :hard then "border-l-2 border-l-red-500"
+            - when :moderate then "border-l-2 border-l-orange-400"
+            - when :easy then "border-l-2 border-l-green-500"
+            - else; ""
+
+            .min-h-28.px-1.5.py-1.5.border-r.border-gray-800{ class: "last:border-r-0 #{today ? 'bg-gray-800/60' : in_month ? '' : 'opacity-30'} #{border_class}" }
+
+              -# Day number + dot
+              .flex.items-center.justify-between.mb-1
+                %span.text-xs{ class: today ? "font-bold text-indigo-400" : "text-gray-500" }= day.day
+                - if day_activities.any?
+                  %span.h-1.5.w-1.5.rounded-full{ class: intensity_dot(intensity) }
+
+              -# Content
+              .space-y-0.5
+                -# Planned - not completed
+                - day_planned.reject(&:completed?).each do |planned|
+                  .rounded.px-1.py-0.5.text-xs.text-gray-400.border.border-dashed.border-gray-700.truncate
+                    = planned.title
+
+                -# Planned - completed (check only)
+                - day_planned.select(&:completed?).each do |planned|
+                  .text-xs.text-green-500.truncate
+                    ✓ #{planned.title}
+
+                -# Activities
+                - day_activities.first(2).each do |activity|
+                  = link_to activity_path(activity), data: { turbo_frame: "_top" },class: "block rounded px-1 py-0.5 text-xs truncate hover:bg-gray-700/50 #{activity_text_color(activity)}" do
+                    = activity.sport_icon
+                    = activity.distance_km ? "#{activity.distance_km}km" : activity.duration_formatted
+
+                -# Overflow
+                - overflow = day_activities.size - 2
+                - if overflow > 0
+                  %span.text-xs.text-gray-600 +#{overflow}

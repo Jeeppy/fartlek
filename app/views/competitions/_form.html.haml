@@ -1,0 +1,60 @@
+= form_with(model: competition, class: "space-y-6") do |f|
+  .grid.grid-cols-2.gap-4
+    %div
+      = f.label :name, "Nom", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.text_field :name, placeholder: "Marathon de Paris", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :date, "Date", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.date_field :date, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  .grid.grid-cols-3.gap-4
+    %div
+      = f.label :priority, "Priorité", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.select :priority, [["Objectif A (principal)", "principal"], ["Objectif B (secondaire)", "secondaire"]], {}, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :sport, "Sport", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.select :sport, Competition.sports.keys.map { |s| [I18n.t("sports.#{s}", default: s.humanize), s] }, {}, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :location, "Lieu", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.text_field :location, placeholder: "Paris", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  .grid.grid-cols-3.gap-4
+    %div
+      = f.label :target_distance_meters, "Distance cible (m)", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.number_field :target_distance_meters, min: 0, placeholder: "42195", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :target_time_seconds, "Temps cible (sec)", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.number_field :target_time_seconds, min: 0, placeholder: "12600", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      = f.label :target_pace_seconds_per_km, "Allure cible (sec/km)", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.number_field :target_pace_seconds_per_km, min: 0, placeholder: "300", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  %div
+    = f.label :objectives, "Objectifs", class: "block text-sm font-medium text-gray-300 mb-1"
+    = f.text_area :objectives, rows: 3, placeholder: "Objectif principal, objectifs secondaires...", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  %div
+    = f.label :notes, "Notes", class: "block text-sm font-medium text-gray-300 mb-1"
+    = f.text_area :notes, rows: 2, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+
+  - if competition.persisted?
+    %hr.border-gray-800
+    %h3.text-sm.font-medium.text-gray-400 Résultats
+    .grid.grid-cols-3.gap-4
+      %div
+        = f.label :result_time_seconds, "Temps réel (sec)", class: "block text-sm font-medium text-gray-300 mb-1"
+        = f.number_field :result_time_seconds, min: 0, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+      %div
+        = f.label :result_pace_seconds_per_km, "Allure réelle (sec/km)", class: "block text-sm font-medium text-gray-300 mb-1"
+        = f.number_field :result_pace_seconds_per_km, min: 0, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+      %div
+        = f.label :result_position, "Classement", class: "block text-sm font-medium text-gray-300 mb-1"
+        = f.number_field :result_position, min: 1, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    %div
+      %label.flex.items-center.gap-2.cursor-pointer
+        = f.check_box :completed, class: "h-4 w-4 rounded border-gray-600 bg-gray-800 text-indigo-500 focus:ring-indigo-500"
+        %span.text-sm.text-gray-300 Compétition terminée
+
+  .flex.items-center.gap-4
+    = f.submit (competition.persisted? ? "Mettre à jour" : "Créer"), class: "rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500 cursor-pointer focus:outline-none"
+    = link_to "Annuler", competitions_path, class: "text-sm text-gray-400 hover:text-gray-300"

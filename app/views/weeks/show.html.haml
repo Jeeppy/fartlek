@@ -1,58 +1,190 @@
 - content_for(:title) { "Semaine du #{l(@start_of_week, format: '%d %B')}" }
 
-.space-y-6
-  -# Navigation
-  .flex.items-center.justify-between
-    = link_to week_path(date: @prev_week), class: "rounded-lg bg-gray-900 px-3 py-2 text-sm text-gray-400 ring-1 ring-gray-800 hover:bg-gray-800" do
-      ← Précédente
-    %h1.text-lg.font-semibold.text-gray-100
-      Semaine du #{l(@start_of_week, format: "%d")} au #{l(@end_of_week, format: "%d %B %Y")}
-    = link_to week_path(date: @next_week), class: "rounded-lg bg-gray-900 px-3 py-2 text-sm text-gray-400 ring-1 ring-gray-800 hover:bg-gray-800" do
-      Suivante →
+%div{ data: { controller: "slideover" } }
+  .space-y-6
+    -# Navigation + Score
+    .flex.items-center.justify-between
+      = link_to week_path(date: @prev_week), class: "rounded-lg bg-gray-900 px-3 py-2 text-sm text-gray-400 ring-1 ring-gray-800 hover:bg-gray-800" do
+        ← Précédente
+      .flex.items-center.gap-4
+        %h1.text-lg.font-semibold.text-gray-100
+          Semaine du #{l(@start_of_week, format: "%d")} au #{l(@end_of_week, format: "%d %B %Y")}
+        - score = @week_analysis[:score]
+        - badge_color = case score[:level]
+        - when :balanced then "#22c55e"
+        - when :loaded then "#f97316"
+        - else; "#ef4444"
+        - badge_label = case score[:level]
+        - when :balanced then "Équilibrée"
+        - when :loaded then "Chargée"
+        - else; "Risquée"
+        %span.rounded.px-2.py-1.text-xs.font-medium.text-gray-100{ style: "background-color: #{badge_color}30; border-left: 3px solid #{badge_color}" }
+          = badge_label
+      = link_to week_path(date: @next_week), class: "rounded-lg bg-gray-900 px-3 py-2 text-sm text-gray-400 ring-1 ring-gray-800 hover:bg-gray-800" do
+        Suivante →
 
-  -# Summary table
-  .rounded-lg.bg-gray-900.ring-1.ring-gray-800.overflow-hidden
-    %table.w-full.text-sm
-      %thead
-        %tr.border-b.border-gray-800.text-left.text-xs.text-gray-500
-          %th.px-5.py-3 Discipline
-          %th.px-5.py-3 Séances
-          %th.px-5.py-3 Distance
-          %th.px-5.py-3 Durée
-          %th.px-5.py-3 D+
-      %tbody
-        - summary_by_sport.each do |sport, data|
-          %tr.border-b.border-gray-800
-            %td.px-5.py-3.text-gray-100
-              %span.mr-2= Activity.new(sport: sport).sport_icon
-              = I18n.t("sports.#{sport}", default: sport.humanize)
-            %td.px-5.py-3.text-gray-300= data[:count]
-            %td.px-5.py-3.text-gray-300= "#{data[:distance_km]} km"
-            %td.px-5.py-3.text-gray-300= format_duration(data[:duration_seconds])
-            %td.px-5.py-3.text-gray-300= "#{data[:elevation]} m"
-        - if summary_by_sport.size > 1
-          %tr.border-t-2.border-gray-700.font-semibold
-            %td.px-5.py-3.text-gray-100 Total
-            %td.px-5.py-3.text-gray-100= week_totals[:count]
-            %td.px-5.py-3.text-gray-100= "#{week_totals[:distance_km]} km"
-            %td.px-5.py-3.text-gray-100= format_duration(week_totals[:duration_seconds])
-            %td.px-5.py-3.text-gray-100= "#{week_totals[:elevation]} m"
+    -# Analyse + Stats semaine
+    .grid.grid-cols-2.gap-4
+      -# Analyse
+      .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+        %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.mb-3 Analyse
+        .space-y-2
+          - @week_analysis[:analysis].each do |item|
+            - color = case item[:type]
+            - when :good then "text-green-400"
+            - when :warning then "text-orange-400"
+            - else; "text-gray-300"
+            .flex.items-center.gap-2
+              - dot = case item[:type]
+              - when :good then "bg-green-400"
+              - when :warning then "bg-orange-400"
+              - else; "bg-gray-500"
+              %span.h-1.5.w-1.5.rounded-full.shrink-0{ class: dot }
+              %p.text-sm{ class: color }= item[:text]
 
-  -# Day by day
-  .space-y-3
-    - (@start_of_week..@end_of_week).each do |day|
-      - day_activities = @activities.select { |a| a.performed_at.to_date == day }
-      - today = day == Date.current
-      .rounded-lg.p-4{ class: today ? "bg-gray-800 ring-1 ring-indigo-500" : "bg-gray-900 ring-1 ring-gray-800" }
-        .flex.items-center.justify-between.mb-2
-          %h3.text-sm.font-medium{ class: today ? "text-indigo-400" : "text-gray-400" }
-            = l(day, format: "%A %d %B").capitalize
-          - if day_activities.any?
-            %span.text-xs.text-gray-500= "#{day_activities.size} activité(s)"
+      -# Stats
+      .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+        %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.mb-3 Indicateurs
+        - stats = @week_analysis[:stats]
+        .grid.grid-cols-4.gap-3
+          %div
+            %dt.text-xs.text-gray-500 RPE moy
+            %dd.text-lg.font-bold.text-gray-100= stats[:avg_rpe] || "—"
+          %div
+            %dt.text-xs.text-gray-500 Intensité
+            %dd.text-lg.font-bold.text-gray-100
+              = "#{stats[:quality_done]}/#{stats[:quality_planned]}"
+              %span.text-xs.text-gray-500.ml-1 séances
+          %div
+            %dt.text-xs.text-gray-500 Repos
+            %dd.text-lg.font-bold.text-gray-100= "#{stats[:rest_days]} jour(s)"
+          %div
+            %dt.text-xs.text-gray-500 Plan
+            %dd.text-lg.font-bold.text-gray-100= stats[:compliance] ? "#{stats[:compliance]}%" : "—"
 
-        - if day_activities.any?
-          .space-y-2
-            - day_activities.each do |activity|
-              = render "activities/activity_card", activity: activity
-        - else
-          %p.text-xs.text-gray-600.italic Repos
+    -# Résumé par discipline
+    = render "summary_table"
+
+    -# Grille horizontale par jour
+    .rounded-lg.bg-gray-900.ring-1.ring-gray-800
+      .grid.grid-cols-7
+        -# Headers avec indicateur intensité
+        - @week_analysis[:daily_load].each do |day_data|
+          - today = day_data[:date] == Date.current
+          - intensity_color = case day_data[:intensity]
+          - when :hard then "border-red-500"
+          - when :moderate then "border-orange-500"
+          - when :easy then "border-green-500"
+          - else; "border-gray-800"
+          .px-3.py-2.border-b-2.text-center{ class: "#{today ? 'bg-gray-800' : ''} #{intensity_color}" }
+            %p.text-xs.font-medium{ class: today ? "text-indigo-400" : "text-gray-500" }
+              = l(day_data[:date], format: "%a").capitalize
+            %p.text-sm.font-medium{ class: today ? "text-indigo-400" : "text-gray-300" }
+              = day_data[:date].day
+            - if day_data[:rpe]
+              %p.text-xs{ class: day_data[:rpe] >= 7 ? "text-red-400" : day_data[:rpe] >= 5 ? "text-orange-400" : "text-green-400" }
+                RPE #{day_data[:rpe]}
+
+        -# Contenu par jour
+        - (@start_of_week..@end_of_week).each do |day|
+          - today = day == Date.current
+          - day_activities = @activities.select { |a| a.performed_at.to_date == day }
+          - day_planned = @planned_sessions.select { |p| p.date == day }
+          - day_data = @week_analysis[:daily_load].find { |d| d[:date] == day }
+          .px-2.py-2.border-r.border-gray-800.min-h-32{ class: "last:border-r-0 #{today ? 'bg-gray-800/50' : ''}" }
+            .space-y-2
+              -# Séances planifiées
+              - day_planned.each do |planned|
+                - status = @week_analysis[:daily_load].find { |d| d[:date] == day }&.dig(:status)
+                - missed = status == :missed && !planned.completed?
+                = link_to planned_session_path(planned), data: { turbo_frame: "slideover_content" }, class: "block rounded-md p-2 ring-1 overflow-hidden cursor-pointer #{planned.completed? ? 'bg-green-950/30 ring-green-800 border-l-2 border-l-green-500' : missed ? 'bg-red-950/30 ring-red-800 border-l-2 border-l-red-500' : 'bg-gray-800/50 ring-gray-700 border-dashed border-l-2 border-l-gray-600'}" do
+                  .flex.items-center.gap-1
+                    %span.text-sm.shrink-0= planned.sport_icon
+                    %span.text-xs.font-medium.truncate.min-w-0{ class: planned.completed? ? 'text-green-300' : missed ? 'text-red-300 line-through' : 'text-gray-300' }
+                      = planned.title
+                  .mt-1.text-xs.text-gray-500
+                    - parts = []
+                    - parts << "#{(planned.target_distance_meters / 1000.0).round(1)}km" if planned.target_distance_meters
+                    - parts << planned.target_duration_formatted if planned.target_duration_formatted
+                    - parts << "RPE #{planned.target_rpe}" if planned.target_rpe
+                    = parts.join(" · ")
+                  -# Comparaison prévu vs réel
+                  - matched = planned.activity
+                  - if matched
+                    .mt-1.text-xs
+                      - if matched.distance_km && planned.target_distance_meters
+                        - target_km = (planned.target_distance_meters / 1000.0).round(1)
+                        %span{ class: matched.distance_km >= target_km ? "text-green-400" : "text-orange-400" }
+                          = "#{matched.distance_km}/#{target_km}km"
+                      - if matched.rpe && planned.target_rpe
+                        - rpe_ok = matched.rpe <= planned.target_rpe + 1
+                        %span.ml-1{ class: rpe_ok ? "text-green-400" : "text-orange-400" }
+                          = "RPE #{matched.rpe}/#{planned.target_rpe}"
+                      - elsif matched.rpe
+                        %span.ml-1.text-gray-500= "RPE #{matched.rpe}"
+                  - if missed
+                    .mt-1.text-xs.text-red-400 Manquée
+
+              -# Activités non planifiées
+              - unplanned = day_activities.select { |a| a.planned_session.nil? }
+              - unplanned.each do |activity|
+                = link_to activity_path(activity), class: "block rounded-md p-2 bg-gray-800 ring-1 ring-gray-700 hover:ring-gray-600 transition" do
+                  .flex.items-center.gap-1.5
+                    %span.text-sm= activity.sport_icon
+                    %span.text-xs.font-medium.text-gray-100.truncate= activity.title.presence || activity.sport.humanize
+                    %span.inline-flex.items-center.rounded.px-1.py-0.5.text-xs.bg-blue-950.text-blue-300{ style: "font-size: 0.5rem" } extra
+                  .mt-1.flex.flex-wrap.gap-x-3.gap-y-0.5.text-xs.text-gray-400
+                    - if activity.distance_km
+                      %span= "#{activity.distance_km}km"
+                    - if activity.duration_formatted
+                      %span= activity.duration_formatted
+                    - if activity.rpe
+                      %span= "RPE #{activity.rpe}"
+
+              -# Repos
+              - if day_activities.empty? && day_planned.empty?
+                .flex.items-center.justify-center.h-full
+                  %span.text-xs.text-gray-600.italic Repos
+
+    -# Bilan hebdomadaire
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+      .flex.items-center.justify-between.mb-4
+        %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Bilan de la semaine
+        - if @weekly_journal
+          = link_to "Modifier", edit_weekly_journal_path(week: @start_of_week), class: "text-indigo-400 hover:text-indigo-300 text-xs"
+        - elsif @start_of_week <= Date.current
+          = link_to new_weekly_journal_path(week: @start_of_week), class: "rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500" do
+            + Ajouter un bilan
+
+      - if @weekly_journal
+        .grid.grid-cols-3.gap-4
+          %div
+            %dt.text-xs.font-medium.text-gray-500 Plaisir
+            %dd.mt-1.text-lg.font-semibold.text-gray-100= @weekly_journal.pleasure ? "#{@weekly_journal.pleasure}/5" : "—"
+          %div
+            %dt.text-xs.font-medium.text-gray-500 Difficulté
+            %dd.mt-1.text-lg.font-semibold.text-gray-100= @weekly_journal.difficulty ? "#{@weekly_journal.difficulty}/5" : "—"
+          %div
+            %dt.text-xs.font-medium.text-gray-500 Fatigue
+            %dd.mt-1.text-lg.font-semibold.text-gray-100= @weekly_journal.fatigue ? "#{@weekly_journal.fatigue}/5" : "—"
+        - if @weekly_journal.comment.present?
+          .mt-4.pt-4.border-t.border-gray-800
+            %p.text-sm.text-gray-300.whitespace-pre-wrap= @weekly_journal.comment
+      - else
+        %p.text-sm.text-gray-500.italic Aucun bilan pour cette semaine.
+
+  -# Slideover panel
+  .fixed.inset-0.z-40.hidden{ data: { slideover_target: "overlay", action: "click->slideover#close" }, style: "background-color: rgba(0,0,0,0.5)" }
+  .fixed.inset-y-0.right-0.z-50.w-full.max-w-md.transform.translate-x-full.transition-transform.duration-300.ease-in-out{ data: { slideover_target: "panel" } }
+    .h-full.overflow-y-auto.bg-gray-900.shadow-xl.ring-1.ring-gray-800
+      .flex.items-center.justify-between.px-6.py-4.border-b.border-gray-800
+        %h2.text-lg.font-semibold.text-gray-100 Détail de la séance
+        %button.text-gray-400{ data: { action: "click->slideover#close" }, type: "button" }
+          %svg.h-6.w-6{ fill: "none", viewBox: "0 0 24 24", "stroke-width": "1.5", stroke: "currentColor" }
+            %path{ "stroke-linecap": "round", "stroke-linejoin": "round", d: "M6 18L18 6M6 6l12 12" }
+      .p-6
+        = turbo_frame_tag "slideover_content"
+
+  -# Navigation bas de page
+  .flex.justify-center.pt-2
+    = link_to "Export JSON", export_week_path(date: @start_of_week), class: "text-xs text-gray-500 hover:text-gray-400"

@@ -1,0 +1,160 @@
+- content_for(:title) { "Dashboard" }
+
+.space-y-6
+  -# Header + Phase en cours
+  - if @current_phase
+    .flex.justify-end
+      %span.inline-flex.items-center.gap-2.rounded-full.px-3.py-1.text-xs.font-medium.text-gray-100{ style: "background-color: #{@current_phase.color}30; border: 1px solid #{@current_phase.color}" }
+        %span.h-2.w-2.rounded-full{ style: "background-color: #{@current_phase.color}" }
+        = @current_phase.name
+
+  .grid.grid-cols-2.gap-4
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800.flex.flex-col.h-full
+      .flex.items-center.justify-between.mb-4
+        %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Ce mois
+        %span.text-xs.text-gray-600= l(Date.current, format: "%B %Y").capitalize
+      .grid.grid-cols-4.gap-4
+        = render "stat_mini", label: "Séances", value: @volume[:current][:count]
+        = render "stat_mini", label: "Distance", value: "#{@volume[:current][:distance_km]} km"
+        = render "stat_mini", label: "Durée", value: format_duration(@volume[:current][:duration_seconds])
+        = render "stat_mini", label: "D+", value: "#{@volume[:current][:elevation]} m"
+      .mt-auto.pt-4.border-t.border-gray-800
+        .flex.items-center.gap-1.mb-2
+          %span.text-xs.text-gray-600 vs #{l(Date.current - 1.month, format: "%B").capitalize}
+        .flex.items-center.gap-4
+          - [["Dist", @volume[:delta][:distance_km]], ["Durée", @volume[:delta][:duration]], ["Séances", @volume[:delta][:count]]].each do |label, delta|
+            - positive = delta.is_a?(Numeric) && delta >= 0
+            %span.inline-flex.items-center.gap-1.rounded-full.px-2.py-0.5.text-xs.font-medium{ class: positive ? "bg-green-950 text-green-400" : "bg-red-950 text-red-400" }
+              = positive ? "↑" : "↓"
+              = label == "Séances" ? "#{delta >= 0 ? '+' : ''}#{delta}" : "#{delta}%"
+              %span.text-gray-500= label
+
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800.flex.flex-col.h-full
+      .flex.items-center.justify-between.mb-4
+        %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Cette semaine
+        %span.text-xs.text-gray-600 🔥 #{@streak} jour(s)
+      - if @weekly[:current][:count] > 0
+        .grid.grid-cols-4.gap-4
+          = render "stat_mini", label: "Séances", value: @weekly[:current][:count]
+          = render "stat_mini", label: "Distance", value: "#{@weekly[:current][:distance_km]} km"
+          = render "stat_mini", label: "Durée", value: format_duration(@weekly[:current][:duration_seconds])
+          = render "stat_mini", label: "D+", value: "#{@weekly[:current][:elevation]} m"
+        -# Comparaison vs semaine précédente
+        .mt-auto.pt-4.border-t.border-gray-800
+          .flex.items-center.gap-1.mb-2
+            %span.text-xs.text-gray-600 vs semaine précédente
+          .flex.items-center.gap-4
+            - prev = @weekly[:previous]
+            - [["Dist", @weekly[:current][:distance_km], prev[:distance_km]], ["Durée", @weekly[:current][:duration_seconds], prev[:duration_seconds]], ["Séances", @weekly[:current][:count], prev[:count]]].each do |label, current, previous|
+              - if previous > 0
+                - delta = label == "Séances" ? current - previous : (((current - previous).to_f / previous) * 100).round(1)
+                - positive = delta >= 0
+                %span.inline-flex.items-center.gap-1.rounded-full.px-2.py-0.5.text-xs.font-medium{ class: positive ? "bg-green-950 text-green-400" : "bg-red-950 text-red-400" }
+                  = positive ? "↑" : "↓"
+                  = label == "Séances" ? "#{delta >= 0 ? '+' : ''}#{delta}" : "#{delta}%"
+                  %span.text-gray-500= label
+      - else
+        .flex.items-center.justify-center.flex-1
+          %p.text-gray-500.text-sm Aucune activité cette semaine.
+
+  .grid.grid-cols-2.gap-4{ class: "grid-rows-[1fr]" }
+
+    -# Aujourd'hui
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800.flex.flex-col
+      .flex.items-center.justify-between.mb-3
+        %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Aujourd'hui
+        - if @today_journal
+          %span.text-lg= @today_journal.mood_emoji
+        - else
+          = link_to new_daily_journal_path, class: "text-xs text-indigo-400 hover:text-indigo-300" do
+            + Journal
+
+      .flex-1
+        - if @today_planned.any? || @today_activities.any?
+          .space-y-2
+            - @today_planned.each do |planned|
+              .flex.items-center.justify-between.rounded-md.px-3.py-2{ class: planned.completed? ? "bg-green-950/30 ring-1 ring-green-800" : "bg-gray-800 ring-1 ring-gray-700" }
+                .flex.items-center.gap-2
+                  %span.text-sm= planned.sport_icon
+                  %span.text-xs.font-medium{ class: planned.completed? ? "text-green-300" : "text-gray-100" }= planned.title
+                  - if planned.completed?
+                    %span.text-xs.text-green-400 ✓
+                .text-xs.text-gray-500
+                  - parts = []
+                  - parts << "#{(planned.target_distance_meters / 1000.0).round(1)}km" if planned.target_distance_meters
+                  - parts << planned.target_duration_formatted if planned.target_duration_formatted
+                  = parts.join(" · ")
+
+            - @today_activities.each do |activity|
+              = link_to activity_path(activity), class: "flex items-center justify-between rounded-md px-3 py-2 bg-gray-800 ring-1 ring-gray-700 hover:ring-gray-600 transition" do
+                .flex.items-center.gap-2
+                  %span.text-sm= activity.sport_icon
+                  %span.text-xs.font-medium.text-gray-100= activity.title.presence || activity.sport.humanize
+                .flex.items-center.gap-3.text-xs.text-gray-400
+                  - if activity.distance_km
+                    %span= "#{activity.distance_km}km"
+                  - if activity.duration_formatted
+                    %span= activity.duration_formatted
+        - else
+          .flex.items-center.justify-center.h-full
+            %span.text-sm.text-gray-500 Repos 😴
+
+    -# Compétitions
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800.flex.flex-col
+      .flex.items-center.justify-between.mb-3
+        %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Compétitions
+        = link_to "Tout voir", competitions_path, class: "text-xs text-indigo-400 hover:text-indigo-300"
+
+      .flex-1
+        - if @upcoming_competitions.any?
+          .space-y-2
+            - @upcoming_competitions.each do |comp|
+              = link_to competition_path(comp), class: "flex items-center justify-between rounded-md px-3 py-2 bg-gray-800 ring-1 ring-gray-700 hover:ring-gray-600 transition" do
+                .flex.items-center.gap-2
+                  %span.text-sm= comp.sport_running? ? "🏃" : comp.sport_cycling? ? "🚴" : "🏊"
+                  %span.text-xs.font-medium.text-gray-100= comp.name
+                  %span.text-xs.text-gray-500= l(comp.date, format: "%d %b")
+                  %span{ class: "inline-flex items-center rounded-full px-1.5 py-0.5 text-xs #{comp.principal? ? 'bg-red-950 text-red-300' : 'bg-blue-950 text-blue-300'}" }
+                    = comp.principal? ? "A" : "B"
+                .flex.items-center.gap-2
+                  %span.text-sm.font-bold.text-indigo-400 J-#{comp.days_until}
+                  - if comp.target_distance_meters
+                    %span.text-xs.text-gray-500= "#{(comp.target_distance_meters / 1000.0).round(1)}km"
+        - else
+          .flex.items-center.justify-center.h-full
+            .text-center
+              %p.text-sm.text-gray-500 Aucune compétition
+              = link_to "Ajouter", new_competition_path, class: "mt-2 inline-block text-xs text-indigo-400 hover:text-indigo-300"
+
+  -# Volume hebdomadaire (12 semaines)
+  .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+    %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.mb-4 Volume hebdomadaire (12 semaines)
+    .grid.grid-cols-2.gap-6
+      %div
+        %h3.text-xs.text-gray-500.mb-2 Distance (km)
+        .h-48.overflow-hidden
+          = column_chart @weekly_volume.map { |w| [w[:week], w[:km]] }, colors: ["#818cf8"], height: "180px", library: { plugins: { legend: { display: false } }, scales: { y: { grid: { color: "#1f2937" }, ticks: { color: "#9ca3af" } }, x: { grid: { display: false }, ticks: { color: "#9ca3af" } } } }
+      %div
+        %h3.text-xs.text-gray-500.mb-2 Durée (heures)
+        .h-48.overflow-hidden
+          = column_chart @weekly_volume.map { |w| [w[:week], w[:hours]] }, colors: ["#22c55e"], height: "180px", library: { plugins: { legend: { display: false } }, scales: { y: { grid: { color: "#1f2937" }, ticks: { color: "#9ca3af" } }, x: { grid: { display: false }, ticks: { color: "#9ca3af" } } } }
+
+  -# Charge d'entraînement
+  .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+    %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.mb-4 Charge d'entraînement (30 jours)
+    - if @fitness.any? { |f| f[:trimp] > 0 }
+      .grid.grid-cols-3.gap-4.mb-4
+        .rounded-md.bg-gray-800.p-3
+          %dt.text-xs.text-gray-500 Fitness (CTL)
+          %dd.mt-1.text-xl.font-bold.text-blue-400= @fitness.last[:ctl]
+        .rounded-md.bg-gray-800.p-3
+          %dt.text-xs.text-gray-500 Fatigue (ATL)
+          %dd.mt-1.text-xl.font-bold.text-red-400= @fitness.last[:atl]
+        .rounded-md.bg-gray-800.p-3
+          %dt.text-xs.text-gray-500 Forme (TSB)
+          %dd.mt-1.text-xl.font-bold{ class: @fitness.last[:tsb] >= 0 ? "text-green-400" : "text-orange-400" }
+            = @fitness.last[:tsb].round(1)
+      .h-48.overflow-hidden
+        = line_chart [{ name: "Fitness (CTL)", data: @fitness.map { |f| [f[:date], f[:ctl]] }, color: "#3b82f6" }, { name: "Fatigue (ATL)", data: @fitness.map { |f| [f[:date], f[:atl]] }, color: "#ef4444" }, { name: "Forme (TSB)", data: @fitness.map { |f| [f[:date], f[:tsb].round(1)] }, color: "#22c55e" }], height: "180px", library: { plugins: { legend: { labels: { color: "#9ca3af", boxWidth: 12, padding: 16 } } }, scales: { y: { grid: { color: "#1f2937" }, ticks: { color: "#9ca3af" } }, x: { grid: { color: "#1f2937" }, ticks: { color: "#9ca3af" } } } }
+    - else
+      %p.text-gray-500.text-sm Pas assez de données pour calculer la charge.

@@ -83,3 +83,5 @@ gem "haml_lint", "~> 0.73.0", groups: [:development, :test], require: false
 gem "pry", "~> 0.16.0"
 
 gem "dotenv", "~> 3.2", groups: [:development, :test]
+
+gem "redcarpet", "~> 3.6"

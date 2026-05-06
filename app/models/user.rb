@@ -12,6 +12,11 @@ class User < ApplicationRecord
   has_many :weekly_journals, dependent: :destroy
   has_one :strava_credential, dependent: :destroy
   has_many :equipments, dependent: :destroy
+  has_many :competitions, dependent: :destroy
+  has_many :training_phases, dependent: :destroy
+  has_many :activity_tags, dependent: :destroy
+  has_many :planned_sessions, dependent: :destroy
+  has_many :ai_conversations, dependent: :destroy
 
   # ─── Enums ────────────────────────────────────────────
   enum :gender, { male: 0, female: 1, other: 2 }

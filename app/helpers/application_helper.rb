@@ -3,15 +3,19 @@
 module ApplicationHelper
   include Pagy::Frontend
 
-  def nav_link(text, path, **)
-    is_active = current_page?(path)
-    css = if is_active
-            "inline-flex items-center border-b-2 border-indigo-400 px-2 pt-1 text-sm font-medium text-gray-100"
-          else
-            "inline-flex items-center border-b-2 border-transparent px-2 pt-1 text-sm font-medium text-gray-400 hover:border-gray-600 hover:text-gray-200"
-          end
+  def nav_link(text, path)
+    active = current_page?(path) ||
+             (text == "Planning" && request.path.include?("week")) ||
+             (text == "Calendrier" && request.path.include?("calendar"))
 
-    link_to(text, path, class: css, **)
+    base = "px-3 py-1.5 rounded-lg text-sm font-medium transition"
+    classes = if active
+                "#{base} bg-gray-800 text-indigo-400"
+              else
+                "#{base} text-gray-400 hover:text-gray-200 hover:bg-gray-800"
+              end
+
+    link_to text, path, class: classes
   end
 
   def pagy_dark_nav(pagy)
@@ -54,5 +58,17 @@ module ApplicationHelper
     hours = seconds / 3600
     minutes = (seconds % 3600) / 60
     format("%<h>dh%<m>02d", h: hours, m: minutes)
+  end
+
+  def render_markdown(text)
+    return "" if text.blank?
+
+    renderer = Redcarpet::Render::HTML.new(hard_wrap: true)
+    markdown = Redcarpet::Markdown.new(renderer,
+                                       autolink: true,
+                                       tables: true,
+                                       fenced_code_blocks: true,
+                                       lax_spacing: true)
+    sanitize(markdown.render(text))
   end
 end

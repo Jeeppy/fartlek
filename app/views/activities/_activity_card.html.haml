@@ -5,8 +5,10 @@
       %div
         .flex.items-center.gap-2
           %h3.text-sm.font-semibold.text-gray-100= activity.title.presence || activity.sport.humanize
-          - if activity.from_strava?
-            %span.inline-flex.items-center.rounded-full.px-2.py-0.5.text-xs.font-medium.text-orange-300.bg-orange-950 Strava
+          - if activity.activity_tags.any?
+            - activity.activity_tags.each do |tag|
+              %span.inline-flex.items-center.rounded-full.px-2.py-0.5.text-xs.font-medium.text-gray-300{ style: "border-left: 3px solid #{tag.color}; background-color: #{tag.color}20" }
+                = tag.name
         .mt-1.flex.items-center.gap-3.text-xs.text-gray-400
           %span= l(activity.performed_at, format: "%a %d %b %Y à %H:%M")
           - if activity.rpe

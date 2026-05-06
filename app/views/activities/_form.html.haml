@@ -1,82 +1,53 @@
-= form_for(activity, html: { class: "space-y-6" }) do |f|
-  = render "devise/shared/error_messages", resource: activity
-
+= form_with(model: activity, class: "space-y-8") do |f|
   -# Sport + Titre
-  .grid.grid-cols-2.gap-4
+  .grid.grid-cols-2.gap-6
     %div
-      = f.label :sport, "Sport", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.label :sport, "Sport", class: "block text-sm font-medium text-gray-300 mb-2"
       = f.select :sport, Activity.sports.keys.map { |s| [I18n.t("sports.#{s}", default: s.humanize), s] }, {}, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
     %div
-      = f.label :title, "Titre", class: "block text-sm font-medium text-gray-300 mb-1"
+      = f.label :title, "Titre", class: "block text-sm font-medium text-gray-300 mb-2"
       = f.text_field :title, placeholder: "Ex: Footing matinal", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
 
-  -# Date + Durée
-  .grid.grid-cols-2.gap-4
-    %div
-      = f.label :performed_at, "Date & heure", class: "block text-sm font-medium text-gray-300 mb-1"
-      = f.datetime_local_field :performed_at, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
-    %div
-      = f.label :duration_seconds, "Durée (secondes)", class: "block text-sm font-medium text-gray-300 mb-1"
-      = f.number_field :duration_seconds, min: 0, placeholder: "3600", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+  -# RPE
+  %div{ data: { controller: "rpe-slider" } }
+    = f.label :rpe, "RPE (effort perçu)", class: "block text-sm font-medium text-gray-300 mb-2"
+    = f.range_field :rpe, min: 1, max: 10, step: 1, value: activity.rpe || 5, class: "w-full accent-indigo-500", data: { action: "input->rpe-slider#update", rpe_slider_target: "slider" }
+    .mt-2.text-center.text-sm.font-semibold.text-indigo-400{ data: { rpe_slider_target: "value" } }
+      = activity.rpe || 5
+  -# Tags
+  - tags = current_user.activity_tags.ordered
+  - if tags.any?
+    %div{ data: { controller: "tag-select" } }
+      %label.block.text-sm.font-medium.text-gray-300.mb-2 Type de séance
+      - grouped_tags(tags).each do |group_name, group_tags|
+        .mb-3
+          %span.text-xs.text-gray-500.block.mb-1= group_name
+          .flex.flex-wrap.gap-2
+            - group_tags.each do |tag|
+              - checked = activity.activity_tag_ids.include?(tag.id)
+              %label.cursor-pointer{ data: { action: "click->tag-select#toggle" } }
+                = f.check_box :activity_tag_ids, { multiple: true, checked: checked, class: "hidden" }, tag.id, nil
+                %span.inline-flex.items-center.rounded-full.px-3.py-1.5.text-xs.font-medium.ring-1.transition{ class: checked ? "ring-2 ring-indigo-500 bg-gray-800 text-white" : "ring-gray-700 bg-gray-900 text-gray-400", style: "border-left: 3px solid #{tag.color}" }
+                  = tag.name
 
-  -# Distance + D+
-  .grid.grid-cols-2.gap-4
+  -# Équipement + Séance planifiée
+  .grid.grid-cols-2.gap-6
+    -# Équipement
     %div
-      = f.label :distance_meters, "Distance (mètres)", class: "block text-sm font-medium text-gray-300 mb-1"
-      = f.number_field :distance_meters, min: 0, placeholder: "10000", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+      = f.label :equipment_id, "Équipement", class: "block text-sm font-medium text-gray-300 mb-2"
+      = f.select :equipment_id, current_user.equipments.active.ordered.map { |e| ["#{e.shoes? ? '👟' : e.bike? ? '🚲' : '🔧'} #{e.name} · #{e.brand} #{e.model} · #{e.total_distance_km}km", e.id] }, { include_blank: "— Aucun —" }, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
     %div
-      = f.label :elevation_gain_meters, "Dénivelé+ (mètres)", class: "block text-sm font-medium text-gray-300 mb-1"
-      = f.number_field :elevation_gain_meters, min: 0, placeholder: "150", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
-
-  -# FC moy + FC max
-  .grid.grid-cols-2.gap-4
-    %div
-      = f.label :average_heart_rate, "FC moyenne", class: "block text-sm font-medium text-gray-300 mb-1"
-      = f.number_field :average_heart_rate, min: 30, max: 220, placeholder: "145", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
-    %div
-      = f.label :max_heart_rate, "FC max", class: "block text-sm font-medium text-gray-300 mb-1"
-      = f.number_field :max_heart_rate, min: 30, max: 250, placeholder: "175", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
-
-  -# Cadence + Puissance
-  .grid.grid-cols-2.gap-4
-    %div
-      = f.label :average_cadence, "Cadence (spm)", class: "block text-sm font-medium text-gray-300 mb-1"
-      = f.number_field :average_cadence, min: 0, placeholder: "180", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
-    %div
-      = f.label :average_power, "Puissance (W)", class: "block text-sm font-medium text-gray-300 mb-1"
-      = f.number_field :average_power, min: 0, placeholder: "250", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
-
-  -# Allure + Calories
-  .grid.grid-cols-2.gap-4
-    %div
-      = f.label :average_pace_seconds_per_km, "Allure (sec/km)", class: "block text-sm font-medium text-gray-300 mb-1"
-      = f.number_field :average_pace_seconds_per_km, min: 0, placeholder: "330", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
-    %div
-      = f.label :calories, "Calories", class: "block text-sm font-medium text-gray-300 mb-1"
-      = f.number_field :calories, min: 0, placeholder: "650", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
-
-  -# RPE + Ressenti
-  .grid.grid-cols-2.gap-4
-    %div{ data: { controller: "rpe-slider" } }
-      = f.label :rpe, "RPE (effort perçu)", class: "block text-sm font-medium text-gray-300 mb-1"
-      = f.range_field :rpe, min: 1, max: 10, step: 1, value: activity.rpe || 5, class: "w-full accent-indigo-500", data: { action: "input->rpe-slider#update", rpe_slider_target: "slider" }
-      .mt-1.text-center.text-sm.font-semibold.text-indigo-400{ data: { rpe_slider_target: "value" } }
-        = activity.rpe || 5
-    %div
-      = f.label :feeling, "Ressenti", class: "block text-sm font-medium text-gray-300 mb-1"
-      = f.select :feeling, Activity.feelings.keys.map { |fe| [I18n.t("feelings.#{fe}", default: fe.humanize), fe] }, { include_blank: "—" }, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
-
-  -# Équipement
-  %div
-    = f.label :equipment_id, "Équipement", class: "block text-sm font-medium text-gray-300 mb-1"
-    = f.select :equipment_id, current_user.equipments.active.ordered.map { |e| [e.name, e.id] }, { include_blank: "— Aucun —" }, class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+      - planned = current_user.planned_sessions.where(completed: false).or(current_user.planned_sessions.where(id: activity.planned_session&.id)).ordered
+      - if planned.any?
+        %label.block.text-sm.font-medium.text-gray-300.mb-2 Séance planifiée
+        = select_tag :planned_session_id, options_for_select(planned.map { |p| ["#{l(p.date, format: '%d/%m')} — #{p.title}", p.id] }, activity.planned_session&.id), include_blank: "— Aucune —", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
 
   -# Notes
   %div
-    = f.label :notes, "Notes", class: "block text-sm font-medium text-gray-300 mb-1"
-    = f.text_area :notes, rows: 3, placeholder: "Sensations, météo, parcours...", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+    = f.label :notes, "Notes", class: "block text-sm font-medium text-gray-300 mb-2"
+    = f.text_area :notes, rows: 4, placeholder: "Sensations, météo, parcours...", class: "block w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
 
-  -# Submit
-  .flex.items-center.gap-4
-    = f.submit (activity.persisted? ? "Mettre à jour" : "Créer l'activité"), class: "rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+  -# Actions
+  .flex.items-center.gap-4.pt-2
+    = f.submit (activity.persisted? ? "Mettre à jour" : "Créer l'activité"), class: "rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500 cursor-pointer focus:outline-none"
     = link_to "Annuler", (activity.persisted? ? activity_path(activity) : activities_path), class: "text-sm text-gray-400 hover:text-gray-300"

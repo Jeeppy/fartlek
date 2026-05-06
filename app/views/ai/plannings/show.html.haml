@@ -1,0 +1,35 @@
+- content_for(:title) { "Planification AI" }
+
+.mx-auto.max-w-3xl.space-y-6
+  .flex.items-center.justify-between
+    %h1.text-2xl.font-bold.text-gray-100 🤖 Planification de la semaine
+    - if @conversation&.messages&.any?
+      = link_to "Réinitialiser", ai_planning_path, data: { turbo_method: :delete, turbo_confirm: "Effacer la conversation ?" }, class: "text-xs text-red-400 hover:text-red-300"
+
+  -# Conversation
+  - if @conversation&.messages&.any?
+    .space-y-4
+      - @conversation.messages.each do |msg|
+        - role = msg["role"] || msg[:role]
+        - content = msg["content"] || msg[:content]
+        - if role == "user"
+          .flex.justify-end
+            .rounded-lg.bg-indigo-950.px-4.py-3.ring-1.ring-indigo-800.max-w-lg
+              %p.text-sm.text-gray-200= content
+        - else
+          .rounded-lg.bg-gray-900.px-6.py-4.ring-1.ring-gray-800
+            .prose.prose-invert.prose-sm.max-w-none.text-gray-300
+              = render_markdown(content)
+
+  -# Formulaire
+  .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+    = form_with url: ai_planning_path, method: :post, class: "space-y-4" do |f|
+      - if @conversation.nil? || @conversation.messages.empty?
+        %p.text-sm.text-gray-400
+          Clique sur "Générer" pour obtenir un plan basé sur ton historique,
+          tes compétitions et ta charge actuelle. Tu pourras ensuite ajuster.
+        = f.submit "Générer le plan de la semaine", class: "rounded-lg bg-purple-600 px-6 py-3 text-sm font-semibold text-white hover:bg-purple-500 cursor-pointer"
+      - else
+        .flex.gap-3
+          = f.text_field :message, placeholder: "Ajuste le plan... (ex: je préfère courir mardi, ajoute du fractionné)", class: "flex-1 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-gray-100 text-sm placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none"
+          = f.submit "Envoyer", class: "rounded-lg bg-purple-600 px-6 py-3 text-sm font-semibold text-white hover:bg-purple-500 cursor-pointer"

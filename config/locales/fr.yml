@@ -62,6 +62,14 @@ fr:
     ok: "Correct"
     good: "Bien"
     great: "Super"
+  phase_types:
+    preparation_generale: "Préparation générale"
+    preparation_specifique: "Préparation spécifique"
+    pre_competition: "Pré-compétition"
+    competition: "Compétition"
+    recuperation: "Récupération"
+    foncier: "Foncier"
+    affutage: "Affûtage"
   date:
     formats:
       default: "%d/%m/%Y"

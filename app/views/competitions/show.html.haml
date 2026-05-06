@@ -1,0 +1,79 @@
+- content_for(:title) { @competition.name }
+
+.space-y-6
+  .flex.items-center.justify-between
+    %div
+      .flex.items-center.gap-3
+        %span.text-3xl= @competition.sport_running? ? "🏃" : @competition.sport_cycling? ? "🚴" : "🏊"
+        %div
+          %h1.text-2xl.font-bold.text-gray-100= @competition.name
+          .flex.items-center.gap-2.mt-1
+            %span{ class: "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium #{@competition.principal? ? 'bg-red-950 text-red-300' : 'bg-blue-950 text-blue-300'}" }
+              = @competition.principal? ? "Objectif A" : "Objectif B"
+            %span.text-sm.text-gray-400
+              = l(@competition.date, format: "%A %d %B %Y").capitalize
+              - if @competition.location.present?
+                = " — #{@competition.location}"
+    .flex.items-center.gap-2
+      - if @competition.days_until
+        %span.text-lg.font-bold.text-indigo-400 J-#{@competition.days_until}
+      = link_to "Modifier", edit_competition_path(@competition), class: "rounded-lg bg-gray-800 px-4 py-2 text-sm font-medium text-gray-300 ring-1 ring-gray-700 hover:bg-gray-700"
+      = link_to "Supprimer", competition_path(@competition), data: { turbo_method: :delete, turbo_confirm: "Supprimer ?" }, class: "rounded-lg bg-red-900 px-4 py-2 text-sm font-medium text-red-300 ring-1 ring-red-800 hover:bg-red-800"
+
+  -# Objectifs
+  .grid.grid-cols-2.gap-4
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+      %h2.text-sm.font-medium.text-gray-400.mb-3 Objectifs cibles
+      .grid.grid-cols-3.gap-4
+        - if @competition.target_distance_meters
+          %div
+            %dt.text-xs.text-gray-500 Distance
+            %dd.text-lg.font-semibold.text-gray-100= "#{(@competition.target_distance_meters / 1000.0).round(1)} km"
+        - if @competition.target_time_formatted
+          %div
+            %dt.text-xs.text-gray-500 Temps
+            %dd.text-lg.font-semibold.text-gray-100= @competition.target_time_formatted
+        - if @competition.target_pace_formatted
+          %div
+            %dt.text-xs.text-gray-500 Allure
+            %dd.text-lg.font-semibold.text-gray-100= "#{@competition.target_pace_formatted} /km"
+
+    - if @competition.completed?
+      .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+        %h2.text-sm.font-medium.text-gray-400.mb-3 Résultats
+        .grid.grid-cols-3.gap-4
+          - if @competition.result_time_seconds
+            %div
+              %dt.text-xs.text-gray-500 Temps
+              %dd.text-lg.font-semibold.text-gray-100
+                - h = @competition.result_time_seconds / 3600
+                - m = (@competition.result_time_seconds % 3600) / 60
+                - s = @competition.result_time_seconds % 60
+                = format("%dh%02d:%02d", h, m, s)
+          - if @competition.result_pace_formatted
+            %div
+              %dt.text-xs.text-gray-500 Allure
+              %dd.text-lg.font-semibold.text-gray-100= "#{@competition.result_pace_formatted} /km"
+          - if @competition.result_position
+            %div
+              %dt.text-xs.text-gray-500 Classement
+              %dd.text-lg.font-semibold.text-gray-100= "#{@competition.result_position}e"
+
+  - if @competition.objectives.present?
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+      %h2.text-sm.font-medium.text-gray-400.mb-2 Objectifs
+      %p.text-sm.text-gray-300.whitespace-pre-wrap= @competition.objectives
+
+  -# Phases d'entraînement liées
+  - phases = @competition.training_phases.ordered
+  - if phases.any?
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+      %h2.text-sm.font-medium.text-gray-400.mb-3 Phases d'entraînement
+      .space-y-2
+        - phases.each do |phase|
+          .flex.items-center.gap-3
+            %span.h-3.w-3.rounded-full{ style: "background-color: #{phase.color}" }
+            %span.text-sm.text-gray-100= phase.name
+            %span.text-xs.text-gray-500= "#{l(phase.start_date, format: '%d %b')} → #{l(phase.end_date, format: '%d %b %Y')}"
+
+  = link_to "← Retour", competitions_path, class: "inline-block text-sm text-gray-400 hover:text-gray-300"

@@ -1,0 +1,73 @@
+= turbo_frame_tag "slideover_content" do
+  .space-y-6
+    -# Header
+    .flex.items-center.gap-3
+      %span.text-3xl= @planned_session.sport_icon
+      %div
+        %h3.text-lg.font-semibold.text-gray-100= @planned_session.title
+        %p.text-sm.text-gray-400= l(@planned_session.date, format: "%A %d %B %Y").capitalize
+
+    -# Status
+    - if @planned_session.completed?
+      .rounded-lg.bg-green-950.p-3.ring-1.ring-green-800
+        %span.text-sm.font-medium.text-green-300 ✓ Séance réalisée
+    - else
+      .rounded-lg.bg-yellow-950.p-3.ring-1.ring-yellow-800
+        %span.text-sm.font-medium.text-yellow-300 ○ À faire
+
+    -# Objectifs
+    - if @planned_session.target_distance_meters || @planned_session.target_duration_seconds || @planned_session.target_pace_seconds_per_km
+      .rounded-lg.bg-gray-800.p-4.ring-1.ring-gray-700
+        %h4.text-xs.font-medium.text-gray-500.mb-3 Objectifs
+        .grid.grid-cols-3.gap-4
+          - if @planned_session.target_distance_meters
+            %div
+              %dt.text-xs.text-gray-500 Distance
+              %dd.mt-1.text-lg.font-semibold.text-gray-100= "#{(@planned_session.target_distance_meters / 1000.0).round(1)} km"
+          - if @planned_session.target_duration_formatted
+            %div
+              %dt.text-xs.text-gray-500 Durée
+              %dd.mt-1.text-lg.font-semibold.text-gray-100= @planned_session.target_duration_formatted
+          - if @planned_session.target_pace_formatted
+            %div
+              %dt.text-xs.text-gray-500 Allure
+              %dd.mt-1.text-lg.font-semibold.text-gray-100= @planned_session.target_pace_formatted
+          - if @planned_session.target_rpe
+            %div
+              %dt.text-xs.text-gray-500 Intensité prévue
+              %dd.mt-1.flex.items-center.gap-2
+                %span.text-lg.font-semibold.text-gray-100= "#{@planned_session.target_rpe}/10"
+                .w-16.h-2.rounded-full.bg-gray-800
+                  - color = @planned_session.target_rpe <= 4 ? "bg-green-500" : @planned_session.target_rpe <= 7 ? "bg-yellow-500" : "bg-red-500"
+                  .h-2.rounded-full{ class: color, style: "width: #{@planned_session.target_rpe * 10}%" }
+
+    -# Description détaillée
+    - if @planned_session.description.present?
+      .rounded-lg.bg-gray-800.p-4.ring-1.ring-gray-700
+        %h4.text-xs.font-medium.text-gray-500.mb-2 Détail de la séance
+        .text-sm.text-gray-300.prose.prose-invert.prose-sm.max-w-none
+          = render_markdown(@planned_session.description)
+
+    -# Activité liée
+    - if @planned_session.activity
+      .rounded-lg.bg-gray-800.p-4.ring-1.ring-gray-700
+        %h4.text-xs.font-medium.text-gray-500.mb-3 Activité réalisée
+        = link_to activity_path(@planned_session.activity), data: { turbo_frame: "_top" }, class: "block rounded-md p-3 bg-gray-900 ring-1 ring-gray-700 hover:ring-gray-600 transition" do
+          .flex.items-center.gap-2
+            %span= @planned_session.activity.sport_icon
+            %span.text-sm.font-medium.text-gray-100= @planned_session.activity.title
+          .mt-1.flex.gap-3.text-xs.text-gray-400
+            - if @planned_session.activity.distance_km
+              %span= "#{@planned_session.activity.distance_km} km"
+            - if @planned_session.activity.duration_formatted
+              %span= @planned_session.activity.duration_formatted
+            - if @planned_session.activity.pace_formatted
+              %span= @planned_session.activity.pace_formatted
+
+    -# Actions
+    .flex.items-center.gap-3.pt-4.border-t.border-gray-800
+      - unless @planned_session.completed?
+        = link_to complete_planned_session_path(@planned_session), data: { turbo_method: :patch, turbo_frame: "_top" }, class: "rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-500" do
+          ✓ Marquer fait
+      = link_to "Modifier", edit_planned_session_path(@planned_session), data: { turbo_frame: "_top" }, class: "rounded-lg bg-gray-800 px-4 py-2 text-sm font-medium text-gray-300 ring-1 ring-gray-700 hover:bg-gray-700"
+      = link_to "Supprimer", planned_session_path(@planned_session), data: { turbo_method: :delete, turbo_confirm: "Supprimer ?", turbo_frame: "_top" }, class: "text-sm text-red-400 hover:text-red-300"

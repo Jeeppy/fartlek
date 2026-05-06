@@ -4,6 +4,9 @@ class Activity < ApplicationRecord
   belongs_to :user
   belongs_to :equipment, optional: true
   has_many :activity_laps, dependent: :destroy
+  has_many :activity_taggings, dependent: :destroy
+  has_many :activity_tags, through: :activity_taggings
+  has_one :planned_session, dependent: :nullify
 
   # ─── Enums ────────────────────────────────────────────
   enum :sport, { running: 0, cycling: 1, walking: 2, swimming: 3, ppg: 4 }
@@ -66,5 +69,25 @@ class Activity < ApplicationRecord
 
   def from_strava?
     strava_id.present?
+  end
+
+  def trimp(user)
+    @trimp ||= ::TrainingLoad::StressCalculator.new(self, user).call
+  end
+
+  def foster_load
+    return nil unless rpe && duration_seconds
+
+    (rpe * (duration_seconds / 60.0)).round(0)
+  end
+
+  def analyzed?
+    ai_analysis.present?
+  end
+
+  def nutrition_estimate
+    return nil unless running? || cycling? || walking?
+
+    @nutrition_estimate ||= ::Nutrition::GelEstimator.new(self).call
   end
 end

@@ -39,7 +39,7 @@ module Analytics
     def previous_date
       case @period
       when :week  then @date - 1.week
-      when :month then @date - 1.year
+      when :month then @date - 1.month
       when :year  then @date - 1.year
       end
     end

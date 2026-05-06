@@ -1,0 +1,19 @@
+.prose h3 {
+  margin-top: 1.5em;
+}
+
+.prose ul {
+  margin-top: 0.5em;
+  margin-bottom: 1em;
+}
+
+.prose p + p {
+  margin-top: 0.75em;
+}
+
+.prose p + h3,
+.prose ul + h3 {
+  margin-top: 1.5em;
+  padding-top: 0.75em;
+  border-top: 1px solid #1f2937;
+}

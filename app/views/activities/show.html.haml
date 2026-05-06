@@ -1,77 +1,285 @@
 - content_for(:title) { @activity.title.presence || @activity.sport.humanize }
 
 .space-y-6
+  -# Header
   .flex.items-center.justify-between
-    .flex.items-center.gap-3
-      %span.text-3xl= @activity.sport_icon
+    .flex.items-center.gap-4
+      .flex.items-center.justify-center.h-14.w-14.rounded-xl.bg-gray-800.ring-1.ring-gray-700
+        %span.text-3xl= @activity.sport_icon
       %div
         %h1.text-2xl.font-bold.text-gray-100= @activity.title.presence || @activity.sport.humanize
-        %p.text-sm.text-gray-400= l(@activity.performed_at, format: "%A %d %B %Y à %H:%M")
+        %p.text-sm.text-gray-400= l(@activity.performed_at, format: "%A %d %B %Y à %H:%M").capitalize
 
     .flex.items-center.gap-2
-      = link_to "Modifier", edit_activity_path(@activity), class: "rounded-lg bg-gray-800 px-4 py-2 text-sm font-medium text-gray-300 ring-1 ring-gray-700 hover:bg-gray-700"
-      = button_to "Supprimer", activity_path(@activity), method: :delete, data: { turbo_confirm: "Supprimer cette activité ?" }, class: "rounded-lg bg-red-900/50 px-4 py-2 text-sm font-medium text-red-300 ring-1 ring-red-800 hover:bg-red-900"
+      - unless @activity.analyzed?
+        = link_to "✦ Analyser", ai_analyses_path(activity_id: @activity.id), data: { turbo_method: :post }, class: "rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-purple-500"
+      = link_to "Modifier", edit_activity_path(@activity), class: "rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500"
+      = link_to "JSON", export_json_activity_path(@activity), class: "rounded-lg bg-gray-800 px-3 py-2.5 text-xs font-medium text-gray-400 ring-1 ring-gray-700 hover:bg-gray-700"
+      = link_to "⋯", activity_path(@activity), data: { turbo_method: :delete, turbo_confirm: "Supprimer cette activité et toutes ses données ?" }, class: "rounded-lg bg-gray-800 px-3 py-2.5 text-xs font-medium text-red-400 ring-1 ring-gray-700 hover:bg-gray-700"
 
-  -# Stats grid
-  .grid.grid-cols-2.gap-4{ class: "sm:grid-cols-3 lg:grid-cols-6" }
-    - stats = []
-    - stats << { label: "Distance", value: "#{@activity.distance_km} km" } if @activity.distance_km
-    - stats << { label: "Durée", value: @activity.duration_formatted } if @activity.duration_formatted
-    - stats << { label: "Allure", value: @activity.pace_formatted } if @activity.pace_formatted
-    - stats << { label: "D+", value: "#{@activity.elevation_gain_meters} m" } if @activity.elevation_gain_meters
-    - stats << { label: "FC moy", value: "#{@activity.average_heart_rate} bpm" } if @activity.average_heart_rate
-    - stats << { label: "FC max", value: "#{@activity.max_heart_rate} bpm" } if @activity.max_heart_rate
-    - stats << { label: "Cadence", value: "#{@activity.average_cadence} spm" } if @activity.average_cadence
-    - stats << { label: "Puissance", value: "#{@activity.average_power} W" } if @activity.average_power
-    - stats << { label: "Calories", value: @activity.calories } if @activity.calories
-    - stats << { label: "RPE", value: "#{@activity.rpe}/10" } if @activity.rpe
-    - stats << { label: "Ressenti", value: @activity.feeling&.humanize } if @activity.feeling
+  -# Tags + Equipment
+  - if @activity.activity_tags.any? || @activity.equipment
+    .flex.flex-wrap.gap-2
+      - @activity.activity_tags.each do |tag|
+        %span.inline-flex.items-center.rounded-full.px-3.py-1.text-xs.font-medium.text-gray-100.bg-gray-900.ring-1.ring-gray-800{ style: "border-left: 4px solid #{tag.color}" }
+          = tag.name
+      - equipment = @activity.equipment
+      - if equipment
+        = link_to equipment_path(equipment), class: "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-gray-100 bg-gray-900 ring-1 ring-gray-800 hover:ring-gray-600 transition", style: "border-left: 4px solid #6366f1" do
+          = equipment.shoes? ? "👟" : equipment.bike? ? "🚲" : "🔧"
+          = "#{equipment.brand} #{equipment.model} (#{equipment.name})"
+          - if equipment.usage_percent
+            %span.text-gray-500= "(#{equipment.usage_percent}%)"
 
-    - stats.each do |stat|
-      .rounded-lg.bg-gray-900.px-4.py-4.ring-1.ring-gray-800
-        %dt.text-xs.font-medium.text-gray-500= stat[:label]
-        %dd.mt-1.text-lg.font-semibold.text-gray-100= stat[:value]
-
-  -# Équipement
-  - if @activity.equipment
-    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
-      .flex.items-center.gap-3
-        %span.text-xl= @activity.equipment.shoes? ? "👟" : @activity.equipment.bike? ? "🚲" : "🔧"
+  -# Résumé (en premier)
+  .rounded-lg.bg-gray-900.p-6.ring-1.ring-gray-800
+    %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.mb-4 Résumé
+    .grid.grid-cols-3.gap-6{ class: "lg:grid-cols-6" }
+      - if @activity.distance_km
         %div
-          %span.text-sm.font-medium.text-gray-100= @activity.equipment.name
-          %span.text-xs.text-gray-400.ml-2= [@activity.equipment.brand, @activity.equipment.model].compact.join(" ")
+          %dt.text-xs.text-gray-500 Distance
+          %dd.mt-1.text-xl.font-bold.text-gray-100= "#{@activity.distance_km} km"
+      - if @activity.duration_formatted
+        %div
+          %dt.text-xs.text-gray-500 Durée
+          %dd.mt-1.text-xl.font-bold.text-gray-100= @activity.duration_formatted
+      - if @activity.pace_formatted
+        %div
+          %dt.text-xs.text-gray-500 Allure
+          %dd.mt-1
+            %span.text-xl.font-bold.text-gray-100= @activity.pace_formatted
+            - if @activity.activity_laps.count > 1
+              - paces = @activity.activity_laps.ordered.filter_map(&:average_pace_seconds_per_km)
+              - if paces.any?
+                - fastest = "#{paces.min / 60}:#{format('%02d', paces.min % 60)}"
+                - slowest = "#{paces.max / 60}:#{format('%02d', paces.max % 60)}"
+                %span.text-xs.text-gray-500.ml-1= "(#{fastest} — #{slowest})"
+      - if @activity.elevation_gain_meters
+        %div
+          %dt.text-xs.text-gray-500 Dénivelé
+          %dd.mt-1.text-xl.font-bold.text-gray-100= "+#{@activity.elevation_gain_meters} m"
+      - if @activity.calories
+        %div
+          %dt.text-xs.text-gray-500 Calories
+          %dd.mt-1
+            %span.text-xl.font-bold.text-gray-100= @activity.calories
+            %span.text-xs.text-gray-600.ml-1 est.
 
-  -# Notes
+  -# Notes (après résumé)
   - if @activity.notes.present?
     .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
-      %h2.text-sm.font-medium.text-gray-400.mb-2 Notes
-      %p.text-sm.text-gray-300.whitespace-pre-wrap= @activity.notes
+      %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.mb-3 Notes
+      .text-sm.text-gray-300.prose.prose-invert.prose-sm.max-w-none
+        = render_markdown(@activity.notes)
+
+  -# Séance planifiée + Analyse (collapsibles)
+  - if @activity.planned_session || @activity.analyzed?
+    .space-y-2
+
+      -# Séance planifiée
+      - if @activity.planned_session
+        .rounded-lg.bg-gray-900.ring-1.ring-gray-800{ data: { controller: "collapsible" } }
+          %button.w-full.px-5.py-3.flex.items-center.justify-between.text-left{ type: "button", data: { action: "click->collapsible#toggle" } }
+            .flex.items-center.gap-3
+              %span.h-2.w-2.rounded-full.bg-indigo-400
+              %span.text-sm.font-medium.text-indigo-400 Séance planifiée
+              %span.text-xs.text-gray-500= @activity.planned_session.title
+            .flex.items-center.gap-3
+              - if @activity.planned_session.target_distance_meters
+                %span.text-xs.text-gray-500= "#{(@activity.planned_session.target_distance_meters / 1000.0).round(1)}km"
+              - if @activity.planned_session.target_duration_formatted
+                %span.text-xs.text-gray-500= @activity.planned_session.target_duration_formatted
+              - if @activity.planned_session.target_pace_formatted
+                %span.text-xs.text-gray-500= @activity.planned_session.target_pace_formatted
+              %svg.h-4.w-4.text-gray-500.transition-transform.duration-200{ data: { collapsible_target: "icon" }, fill: "none", viewBox: "0 0 24 24", "stroke-width": "1.5", stroke: "currentColor" }
+                %path{ "stroke-linecap": "round", "stroke-linejoin": "round", d: "M19.5 8.25l-7.5 7.5-7.5-7.5" }
+          .hidden.px-5.pb-4{ data: { collapsible_target: "content" } }
+            -# Conformité
+            .pt-3.border-t.border-gray-800
+              .grid.grid-cols-3.gap-3.mb-3
+                - if @activity.planned_session.target_duration_seconds && @activity.duration_seconds
+                  - ok = (@activity.duration_seconds - @activity.planned_session.target_duration_seconds).abs < 300
+                  .flex.items-center.gap-2
+                    %span.text-xs{ class: ok ? "text-green-400" : "text-orange-400" }= ok ? "✓" : "⚠"
+                    %span.text-xs.text-gray-400
+                      Durée #{@activity.duration_formatted} / #{@activity.planned_session.target_duration_formatted}
+                - if @activity.planned_session.target_distance_meters && @activity.distance_meters
+                  - target_km = (@activity.planned_session.target_distance_meters / 1000.0).round(1)
+                  - ok = @activity.distance_km >= target_km * 0.9
+                  .flex.items-center.gap-2
+                    %span.text-xs{ class: ok ? "text-green-400" : "text-orange-400" }= ok ? "✓" : "⚠"
+                    %span.text-xs.text-gray-400
+                      Distance #{@activity.distance_km} / #{target_km}km
+                - if @activity.planned_session.target_rpe && @activity.rpe
+                  - ok = @activity.rpe <= @activity.planned_session.target_rpe + 1
+                  .flex.items-center.gap-2
+                    %span.text-xs{ class: ok ? "text-green-400" : "text-orange-400" }= ok ? "✓" : "⚠"
+                    %span.text-xs.text-gray-400
+                      RPE #{@activity.rpe} / #{@activity.planned_session.target_rpe}
+
+              - if @activity.planned_session.description.present?
+                .text-sm.text-gray-300.prose.prose-invert.prose-sm.max-w-none
+                  = render_markdown(@activity.planned_session.description)
+
+      -# Analyse
+      - if @activity.analyzed?
+        .rounded-lg.bg-gray-900.ring-1.ring-gray-800{ data: { controller: "collapsible" } }
+          %button.w-full.px-5.py-3.flex.items-center.justify-between.text-left{ type: "button", data: { action: "click->collapsible#toggle" } }
+            .flex.items-center.gap-2
+              %span.text-purple-400 ✦
+              %span.text-sm.font-medium.text-purple-400 Analyse
+            .flex.items-center.gap-3
+              %span.text-xs.text-gray-600= l(@activity.ai_analyzed_at, format: "%d/%m à %H:%M")
+              = link_to "Ré-analyser", ai_analyses_path(activity_id: @activity.id), data: { turbo_method: :post }, class: "text-xs text-purple-400 hover:text-purple-300"
+              %svg.h-4.w-4.text-gray-500.transition-transform.duration-200{ data: { collapsible_target: "icon" }, fill: "none", viewBox: "0 0 24 24", "stroke-width": "1.5", stroke: "currentColor" }
+                %path{ "stroke-linecap": "round", "stroke-linejoin": "round", d: "M19.5 8.25l-7.5 7.5-7.5-7.5" }
+          .hidden.px-5.pb-5{ data: { collapsible_target: "content" } }
+            .pt-3.border-t.border-gray-800
+              .prose.prose-invert.prose-sm.max-w-none.text-gray-300
+                = render_markdown(@activity.ai_analysis)
+
+  -# Métriques
+  - has_cardio = @activity.average_heart_rate || @activity.max_heart_rate || @activity.average_cadence || @activity.average_power
+  - has_effort = @activity.rpe || @activity.trimp(current_user) || @activity.foster_load
+  - if has_cardio || has_effort
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+      %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.mb-4 Métriques
+      .grid.grid-cols-3.gap-4{ class: "lg:grid-cols-6" }
+        - if @activity.average_heart_rate
+          %div
+            %dt.text-xs.text-gray-500 FC moy
+            %dd.mt-1.flex.items-baseline.gap-1
+              %span.text-xl.font-bold.text-gray-100= @activity.average_heart_rate
+              %span.text-xs.text-gray-500 bpm
+              - if current_user.estimated_max_hr
+                - pct = (@activity.average_heart_rate.to_f / current_user.estimated_max_hr * 100).round(0)
+                %span.text-xs.text-gray-600= "(#{pct}%)"
+        - if @activity.max_heart_rate
+          %div
+            %dt.text-xs.text-gray-500 FC max
+            %dd.mt-1.flex.items-baseline.gap-1
+              %span.text-xl.font-bold.text-gray-100= @activity.max_heart_rate
+              %span.text-xs.text-gray-500 bpm
+        - if @activity.average_cadence
+          %div
+            %dt.text-xs.text-gray-500 Cadence
+            %dd.mt-1.flex.items-baseline.gap-1
+              %span.text-xl.font-bold.text-gray-100= @activity.average_cadence
+              %span.text-xs.text-gray-500 spm
+        - if @activity.average_power
+          %div
+            %dt.text-xs.text-gray-500 Puissance
+            %dd.mt-1.flex.items-baseline.gap-1
+              %span.text-xl.font-bold.text-gray-100= @activity.average_power
+              %span.text-xs.text-gray-500 W
+        - if @activity.rpe
+          %div
+            %dt.text-xs.text-gray-500 RPE
+            %dd.mt-1
+              .flex.items-center.gap-2
+                %span.text-xl.font-bold.text-gray-100= "#{@activity.rpe}/10"
+                .w-16.h-2.rounded-full.bg-gray-800
+                  - color = @activity.rpe <= 4 ? "bg-green-500" : @activity.rpe <= 7 ? "bg-yellow-500" : "bg-red-500"
+                  .h-2.rounded-full{ class: color, style: "width: #{@activity.rpe * 10}%" }
+        - trimp = @activity.trimp(current_user)
+        - if trimp
+          %div
+            %dt.text-xs.text-gray-500 TRIMP
+            %dd.mt-1.text-xl.font-bold.text-gray-100= trimp
+        - if @activity.foster_load
+          %div
+            %dt.text-xs.text-gray-500 Foster
+            %dd.mt-1.flex.items-baseline.gap-1
+              %span.text-xl.font-bold.text-gray-100= @activity.foster_load
+              %span.text-xs.text-gray-500 UA
+
+  -# Nutrition estimée
+  - nutrition = @activity.nutrition_estimate
+  - if nutrition && nutrition[:gels] > 0
+    .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
+      %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.mb-4 Nutrition estimée
+      .grid.grid-cols-3.gap-4
+        %div
+          %dt.text-xs.text-gray-500 Gels
+          %dd.mt-1.flex.items-baseline.gap-1
+            %span.text-xl.font-bold.text-gray-100= nutrition[:gels]
+            %span.text-xs.text-gray-500= "(#{nutrition[:carbs_g]}g glucides)"
+        %div
+          %dt.text-xs.text-gray-500 Hydratation
+          %dd.mt-1.flex.items-baseline.gap-1
+            %span.text-xl.font-bold.text-gray-100= nutrition[:hydration_ml]
+            %span.text-xs.text-gray-500 ml
+        %div
+          %dt.text-xs.text-gray-500 Conseil
+          %dd.mt-1.text-xs.text-gray-300= nutrition[:note]
 
   -# Laps
-  - if @activity.activity_laps.any?
+  - if @activity.activity_laps.count > 1
     .rounded-lg.bg-gray-900.ring-1.ring-gray-800.overflow-hidden
-      %h2.px-5.py-3.text-sm.font-medium.text-gray-400.border-b.border-gray-800 Laps
+      .px-5.py-4.border-b.border-gray-800
+        .flex.items-center.justify-between
+          %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Laps
+          %span.text-xs.text-gray-500= "#{@activity.activity_laps.count} segments"
+
+      -# Lap chart
+      - laps_data = @activity.activity_laps.ordered.map { |l| { number: l.lap_number, pace: l.average_pace_seconds_per_km, hr: l.average_heart_rate, cadence: l.average_cadence, power: l.average_power } }
+      - show_pace = laps_data.any? { |l| l[:pace].present? } && %w[running cycling walking].include?(@activity.sport)
+      - has_hr = laps_data.any? { |l| l[:hr].present? }
+      - has_cadence = laps_data.any? { |l| l[:cadence].present? }
+      - has_power = laps_data.any? { |l| l[:power].present? }
+
+      - if show_pace || has_hr || has_cadence || has_power
+        .px-5.py-4.border-b.border-gray-800{ data: { controller: "lap-chart", lap_chart_laps_value: laps_data.to_json } }
+          .flex.gap-2.mb-4
+            - if show_pace
+              %button.px-3.py-1.rounded-lg.text-xs.font-medium.bg-indigo-600.text-white{ data: { action: "click->lap-chart#switch", lap_chart_target: "tab", metric: "pace" } } Allure
+            - if has_hr
+              %button.px-3.py-1.rounded-lg.text-xs.font-medium.bg-gray-800.text-gray-400{ data: { action: "click->lap-chart#switch", lap_chart_target: "tab", metric: "hr" } } FC
+            - if has_cadence
+              %button.px-3.py-1.rounded-lg.text-xs.font-medium.bg-gray-800.text-gray-400{ data: { action: "click->lap-chart#switch", lap_chart_target: "tab", metric: "cadence" } } Cadence
+            - if has_power
+              %button.px-3.py-1.rounded-lg.text-xs.font-medium.bg-gray-800.text-gray-400{ data: { action: "click->lap-chart#switch", lap_chart_target: "tab", metric: "power" } } Puissance
+          .h-40
+            %canvas{ data: { lap_chart_target: "canvas" } }
+
       %table.w-full.text-sm
         %thead
-          %tr.border-b.border-gray-800.text-left.text-xs.text-gray-500
-            %th.px-5.py-2 #
-            %th.px-5.py-2 Distance
-            %th.px-5.py-2 Durée
-            %th.px-5.py-2 Allure
-            %th.px-5.py-2 FC
-            %th.px-5.py-2 Cad
-            %th.px-5.py-2 Puiss
-            %th.px-5.py-2 D+
+          %tr.border-b.border-gray-800.text-left.text-xs.text-gray-500.uppercase.tracking-wider
+            %th.px-5.py-3 #
+            %th.px-5.py-3 Distance
+            %th.px-5.py-3 Durée
+            - if show_pace
+              %th.px-5.py-3 Allure
+            %th.px-5.py-3 FC
+            - if has_cadence
+              %th.px-5.py-3 Cad
+            - if has_power
+              %th.px-5.py-3 Puiss
+            %th.px-5.py-3 D+
         %tbody
-          - @activity.activity_laps.ordered.each do |lap|
-            %tr.border-b.border-gray-800
-              %td.px-5.py-2.text-gray-400= lap.lap_number
-              %td.px-5.py-2.text-gray-100= lap.distance_meters ? "#{(lap.distance_meters / 1000.0).round(2)} km" : "—"
-              %td.px-5.py-2.text-gray-100= lap.duration_seconds ? "#{lap.duration_seconds / 60}:#{format('%02d', lap.duration_seconds % 60)}" : "—"
-              %td.px-5.py-2.text-gray-100= lap.pace_formatted || "—"
-              %td.px-5.py-2.text-gray-100= lap.average_heart_rate || "—"
-              %td.px-5.py-2.text-gray-100= lap.average_cadence || "—"
-              %td.px-5.py-2.text-gray-100= lap.average_power ? "#{lap.average_power} W" : "—"
-              %td.px-5.py-2.text-gray-100= lap.elevation_gain_meters ? "#{lap.elevation_gain_meters} m" : "—"
+          - @activity.activity_laps.ordered.each_with_index do |lap, i|
+            %tr{ class: "border-b border-gray-800 #{i.even? ? '' : 'bg-gray-800/30'}" }
+              %td.px-5.py-3.text-gray-500.font-mono= lap.lap_number
+              %td.px-5.py-3.text-gray-100= lap.distance_meters ? "#{(lap.distance_meters / 1000.0).round(2)} km" : "—"
+              %td.px-5.py-3.text-gray-100.font-mono= lap.duration_seconds ? "#{lap.duration_seconds / 60}:#{format('%02d', lap.duration_seconds % 60)}" : "—"
+              - if show_pace
+                %td.px-5.py-3.text-gray-100.font-mono= lap.pace_formatted || "—"
+              %td.px-5.py-3.text-gray-100= lap.average_heart_rate || "—"
+              - if has_cadence
+                %td.px-5.py-3.text-gray-100= lap.average_cadence || "—"
+              - if has_power
+                %td.px-5.py-3.text-gray-100= lap.average_power ? "#{lap.average_power} W" : "—"
+              %td.px-5.py-3.text-gray-100= lap.elevation_gain_meters ? "#{lap.elevation_gain_meters} m" : "—"
 
-  = link_to "← Retour", activities_path, class: "inline-block text-sm text-gray-400 hover:text-gray-300"
+  -# Navigation
+  .flex.items-center.justify-between.pt-2
+    .flex.items-center.gap-4
+      = link_to "← Retour", activities_path, class: "text-sm text-gray-400 hover:text-gray-300"
+      - if @prev_activity
+        = link_to "← #{@prev_activity.title.presence || 'Précédente'}", activity_path(@prev_activity), class: "text-xs text-indigo-400 hover:text-indigo-300"
+    .flex.items-center.gap-4
+      - if @next_activity
+        = link_to "#{@next_activity.title.presence || 'Suivante'} →", activity_path(@next_activity), class: "text-xs text-indigo-400 hover:text-indigo-300"
+      - if @activity.from_strava?
+        = link_to "https://www.strava.com/activities/#{@activity.strava_id}", target: "_blank", rel: "noopener", class: "inline-flex items-center gap-1 text-xs text-orange-400 hover:text-orange-300" do
+          Strava →
