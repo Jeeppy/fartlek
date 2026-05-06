@@ -22,7 +22,7 @@ gem "devise", "~> 4.9"
 gem "connection_pool", "~> 2.4"
 gem "hiredis-client", "~> 0.28.0"
 gem "redis", "~> 5.3"
-gem "sidekiq", "~> 7.3"
+gem "sidekiq", "~> 8.0"
 
 # ─── HTTP & APIs ──────────────────────────────────────
 gem "faraday", "~> 2.12"
