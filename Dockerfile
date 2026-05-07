@@ -11,6 +11,7 @@ RUN apt-get update -qq && \
     curl \
     git \
     nodejs \
+    libyaml-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY Gemfile Gemfile.lock ./
