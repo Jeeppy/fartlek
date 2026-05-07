@@ -20,7 +20,7 @@ module Training
     def trend_insight
       return nil unless @fitness.is_a?(Array) && @fitness.size >= 7
 
-      recent_tsb = @fitness.last(7).map { |f| f[:tsb] }
+      recent_tsb = @fitness.last(7).pluck(:tsb)
       trend = recent_tsb.last - recent_tsb.first
 
       if trend > 5
@@ -34,9 +34,9 @@ module Training
       current = @weekly[:current]
       previous = @weekly[:previous]
 
-      if current[:count] == 0
+      if current[:count].zero?
         "Aucune séance cette semaine. Reprise progressive recommandée."
-      elsif previous[:distance_km] > 0
+      elsif previous[:distance_km].positive?
         delta = ((current[:distance_km] - previous[:distance_km]).to_f / previous[:distance_km] * 100).round(0)
         if delta > 15
           "Volume en hausse de #{delta}% vs semaine dernière."

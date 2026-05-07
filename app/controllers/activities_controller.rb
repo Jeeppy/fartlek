@@ -8,7 +8,7 @@ class ActivitiesController < ApplicationController
 
   def show
     @prev_activity = current_user.activities
-                                 .where("performed_at < ?", @activity.performed_at)
+                                 .where(performed_at: ...@activity.performed_at)
                                  .order(performed_at: :desc)
                                  .first
     @next_activity = current_user.activities
@@ -70,9 +70,9 @@ class ActivitiesController < ApplicationController
   end
 
   def activity_params
-    params.require(:activity).permit(
-      :sport, :title, :rpe, :notes, :equipment_id,
-      activity_tag_ids: []
+    params.expect(
+      activity: [:sport, :title, :rpe, :notes, :equipment_id,
+                 { activity_tag_ids: [] }]
     )
   end
 

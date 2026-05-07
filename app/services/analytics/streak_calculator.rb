@@ -7,19 +7,12 @@ module Analytics
     end
 
     def call
-      dates = @user.activities
-                   .where("performed_at >= ?", 1.year.ago)
-                   .order(performed_at: :desc)
-                   .pluck(:performed_at)
-                   .map { |d| d.to_date }
-                   .uniq
+      dates = activity_dates
 
       return 0 if dates.empty?
 
       streak = 0
       current = Date.current
-
-      # Si pas d'activité aujourd'hui, commencer à hier
       current -= 1.day unless dates.include?(current)
 
       dates.each do |date|
@@ -30,6 +23,15 @@ module Analytics
       end
 
       streak
+    end
+
+    def activity_dates
+      @user.activities
+           .where(performed_at: 1.year.ago..)
+           .order(performed_at: :desc)
+           .pluck(:performed_at)
+           .map(&:to_date)
+           .uniq
     end
   end
 end

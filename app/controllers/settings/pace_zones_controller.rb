@@ -29,7 +29,7 @@ module Settings
     private
 
     def zone_params
-      params.require(:pace_zone).permit(:name, :min_pace_seconds_per_km, :max_pace_seconds_per_km, :color)
+      params.expect(pace_zone: [:name, :min_pace_seconds_per_km, :max_pace_seconds_per_km, :color])
     end
   end
 end

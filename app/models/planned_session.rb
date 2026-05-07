@@ -34,7 +34,7 @@ class PlannedSession < ApplicationRecord
 
     hours = target_duration_seconds / 3600
     minutes = (target_duration_seconds % 3600) / 60
-    if hours > 0
+    if hours.positive?
       format("%<h>dh%<m>02d", h: hours, m: minutes)
     else
       format("%<m>dmin", m: minutes)

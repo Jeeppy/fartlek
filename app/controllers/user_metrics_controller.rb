@@ -51,6 +51,6 @@ class UserMetricsController < ApplicationController
   end
 
   def metric_params
-    params.require(:user_metric).permit(:recorded_on, :metric_type, :value, :unit, :notes)
+    params.expect(user_metric: [:recorded_on, :metric_type, :value, :unit, :notes])
   end
 end

@@ -18,7 +18,7 @@ class DashboardController < ApplicationController
                                 .order(:date)
                                 .first
     @recent_activities = current_user.activities
-                                     .where("performed_at < ?", Time.current)
+                                     .where(performed_at: ...Time.current)
                                      .chronological
                                      .limit(3)
   end

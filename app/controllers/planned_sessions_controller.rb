@@ -52,10 +52,10 @@ class PlannedSessionsController < ApplicationController
   end
 
   def session_params
-    params.require(:planned_session).permit(
-      :date, :sport, :title, :description,
-      :target_duration_seconds, :target_distance_meters,
-      :target_pace_seconds_per_km, :target_rpe
+    params.expect(
+      planned_session: [:date, :sport, :title, :description,
+                        :target_duration_seconds, :target_distance_meters,
+                        :target_pace_seconds_per_km, :target_rpe]
     )
   end
 end

@@ -5,11 +5,9 @@ module Export
     def index
       activities = current_user.activities.chronological
 
-      if params[:from].present?
-        activities = activities.where("performed_at >= ?", params[:from].to_date.beginning_of_day)
-      end
+      activities = activities.where(performed_at: params[:from].to_date.beginning_of_day..) if params[:from].present?
 
-      activities = activities.where("performed_at <= ?", params[:to].to_date.end_of_day) if params[:to].present?
+      activities = activities.where(performed_at: ..params[:to].to_date.end_of_day) if params[:to].present?
 
       activities = activities.by_sport(params[:sport]) if params[:sport].present?
 

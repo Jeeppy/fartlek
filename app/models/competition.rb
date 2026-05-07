@@ -11,8 +11,8 @@ class Competition < ApplicationRecord
   validates :date, presence: true
   validates :priority, presence: true
 
-  scope :upcoming, -> { where("date >= ?", Date.current).order(:date) }
-  scope :past, -> { where("date < ?", Date.current).order(date: :desc) }
+  scope :upcoming, -> { where(date: Date.current..).order(:date) }
+  scope :past, -> { where(date: ...Date.current).order(date: :desc) }
   scope :principal, -> { where(priority: :principal) }
   scope :secondaire, -> { where(priority: :secondaire) }
 
@@ -34,7 +34,7 @@ class Competition < ApplicationRecord
     hours = target_time_seconds / 3600
     minutes = (target_time_seconds % 3600) / 60
     seconds = target_time_seconds % 60
-    if hours > 0
+    if hours.positive?
       format("%<h>dh%<m>02d:%<s>02d", h: hours, m: minutes, s: seconds)
     else
       format("%<m>d:%<s>02d", m: minutes, s: seconds)

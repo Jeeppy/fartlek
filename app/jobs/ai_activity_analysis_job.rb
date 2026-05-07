@@ -7,7 +7,7 @@ class AiActivityAnalysisJob < ApplicationJob
     activity = Activity.find(activity_id)
     return if activity.analyzed?
     return unless activity.running?
-    return unless ENV["ANTHROPIC_API_KEY"].present?
+    return if ENV["ANTHROPIC_API_KEY"].blank?
 
     ::Ai::ActivityAnalyzer.new(activity, activity.user).call
   rescue ::Ai::BaseService::ApiError => e

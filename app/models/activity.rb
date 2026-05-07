@@ -42,7 +42,7 @@ class Activity < ApplicationRecord
     minutes = (duration_seconds % 3600) / 60
     secs = duration_seconds % 60
 
-    if hours > 0
+    if hours.positive?
       format("%<h>dh%<m>02d", h: hours, m: minutes)
     else
       format("%<m>d:%<s>02d", m: minutes, s: secs)

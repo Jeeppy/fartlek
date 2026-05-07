@@ -7,6 +7,10 @@ module Ai
 
     class ApiError < StandardError; end
 
+    def initialize
+      # Base initializer for subclasses
+    end
+
     private
 
     def call_api(system:, messages:, max_tokens: 2000)

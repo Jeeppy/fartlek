@@ -41,6 +41,6 @@ class WeeklyJournalsController < ApplicationController
   end
 
   def journal_params
-    params.require(:weekly_journal).permit(:week_start_date, :pleasure, :difficulty, :fatigue, :comment)
+    params.expect(weekly_journal: [:week_start_date, :pleasure, :difficulty, :fatigue, :comment])
   end
 end

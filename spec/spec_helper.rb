@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require 'simplecov'
-SimpleCov.start 'rails' do
+require "simplecov"
+SimpleCov.start "rails" do
   enable_coverage :branch
-  add_filter '/spec/'
-  add_filter '/config/'
-  add_filter '/vendor/'
+  add_filter "/spec/"
+  add_filter "/config/"
+  add_filter "/vendor/"
 
-  add_group 'Models', 'app/models'
-  add_group 'Controllers', 'app/controllers'
-  add_group 'Services', 'app/services'
-  add_group 'Jobs', 'app/jobs'
+  add_group "Models", "app/models"
+  add_group "Controllers", "app/controllers"
+  add_group "Services", "app/services"
+  add_group "Jobs", "app/jobs"
 end
 
 RSpec.configure do |config|
@@ -24,7 +24,7 @@ RSpec.configure do |config|
 
   config.shared_context_metadata_behavior = :apply_to_host_groups
   config.filter_run_when_matching :focus
-  config.example_status_persistence_file_path = 'tmp/spec_examples.txt'
+  config.example_status_persistence_file_path = "tmp/spec_examples.txt"
   config.disable_monkey_patching!
   config.order = :random
   Kernel.srand config.seed

@@ -40,7 +40,7 @@ class TrainingPhase < ApplicationRecord
   end
 
   def covers_date?(date)
-    date >= start_date && date <= end_date
+    date.between?(start_date, end_date)
   end
 
   private

@@ -30,7 +30,7 @@ module Settings
     private
 
     def zone_params
-      params.require(:heart_rate_zone).permit(:name, :min_bpm, :max_bpm, :color)
+      params.expect(heart_rate_zone: [:name, :min_bpm, :max_bpm, :color])
     end
   end
 end

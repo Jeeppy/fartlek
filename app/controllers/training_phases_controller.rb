@@ -43,8 +43,8 @@ class TrainingPhasesController < ApplicationController
   end
 
   def phase_params
-    params.require(:training_phase).permit(
-      :name, :start_date, :end_date, :phase_type, :color, :description, :competition_id
+    params.expect(
+      training_phase: [:name, :start_date, :end_date, :phase_type, :color, :description, :competition_id]
     )
   end
 end

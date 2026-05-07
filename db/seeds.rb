@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-puts "🌱 Seeding database..."
+Rails.logger.debug "🌱 Seeding database..."
 
 admin = User.find_or_create_by!(email: "admin@fartlek.dev") do |u|
   u.first_name = "Admin"
@@ -13,7 +13,7 @@ admin = User.find_or_create_by!(email: "admin@fartlek.dev") do |u|
   u.admin = true
 end
 
-puts "  ✅ Admin: #{admin.email} / password123"
+Rails.logger.debug { "  ✅ Admin: #{admin.email} / password123" }
 
 user = User.find_or_create_by!(email: "runner@fartlek.dev") do |u|
   u.first_name = "Marie"
@@ -26,6 +26,6 @@ user = User.find_or_create_by!(email: "runner@fartlek.dev") do |u|
   u.admin = false
 end
 
-puts "  ✅ User:  #{user.email} / password123"
+Rails.logger.debug { "  ✅ User:  #{user.email} / password123" }
 
-puts "🏁 Done!"
+Rails.logger.debug "🏁 Done!"

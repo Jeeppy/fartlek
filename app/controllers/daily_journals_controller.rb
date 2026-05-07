@@ -41,6 +41,6 @@ class DailyJournalsController < ApplicationController
   end
 
   def journal_params
-    params.require(:daily_journal).permit(:date, :mood, :sleep_quality, :sleep_hours, :fatigue, :soreness, :comment)
+    params.expect(daily_journal: [:date, :mood, :sleep_quality, :sleep_hours, :fatigue, :soreness, :comment])
   end
 end

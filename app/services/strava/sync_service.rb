@@ -43,13 +43,24 @@ module Strava
     end
 
     def import_activity(data)
-      return if Activity.exists?(user: credential.user, strava_id: data["id"])
-
-      sport = Strava::ActivityMapper.map_sport(data["type"])
-      return if sport.nil?
+      return if activity_exists?(data["id"])
+      return if unsupported_sport?(data["type"])
 
       detail = client.activity(data["id"])
       mapped = Strava::ActivityMapper.new(credential.user, detail).call
+
+      persist_activity(mapped)
+    end
+
+    def activity_exists?(strava_id)
+      Activity.exists?(user: credential.user, strava_id: strava_id)
+    end
+
+    def unsupported_sport?(type)
+      Strava::ActivityMapper.map_sport(type).nil?
+    end
+
+    def persist_activity(mapped)
       laps = mapped.delete(:laps)
       activity = credential.user.activities.create!(mapped)
       create_laps(activity, laps)

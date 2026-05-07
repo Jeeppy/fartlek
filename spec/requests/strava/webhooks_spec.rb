@@ -11,7 +11,7 @@ RSpec.describe "Strava::Webhooks" do
         "hub.verify_token" => "STRAVA_VERIFY_TOKEN"
       }
       expect(response).to have_http_status(:ok)
-      body = JSON.parse(response.body)
+      body = response.parsed_body
       expect(body["hub.challenge"]).to eq("challenge_token_123")
     end
   end

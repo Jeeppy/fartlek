@@ -46,11 +46,11 @@ class CompetitionsController < ApplicationController
   end
 
   def competition_params
-    params.require(:competition).permit(
-      :name, :date, :priority, :sport, :location,
-      :target_distance_meters, :target_time_seconds, :target_pace_seconds_per_km,
-      :objectives, :notes,
-      :result_time_seconds, :result_pace_seconds_per_km, :result_position, :completed
+    params.expect(
+      competition: [:name, :date, :priority, :sport, :location,
+                    :target_distance_meters, :target_time_seconds, :target_pace_seconds_per_km,
+                    :objectives, :notes,
+                    :result_time_seconds, :result_pace_seconds_per_km, :result_position, :completed]
     )
   end
 end

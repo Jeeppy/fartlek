@@ -46,8 +46,8 @@ class EquipmentController < ApplicationController
   end
 
   def equipment_params
-    params.require(:equipment).permit(:name, :equipment_type, :brand, :model,
-                                      :purchase_date, :initial_distance_meters,
-                                      :max_distance_meters, :retired, :notes)
+    params.expect(equipment: [:name, :equipment_type, :brand, :model,
+                              :purchase_date, :initial_distance_meters,
+                              :max_distance_meters, :retired, :notes])
   end
 end
