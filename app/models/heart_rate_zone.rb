@@ -45,8 +45,6 @@ class HeartRateZone < ApplicationRecord
     end
   end
 
-  private_class_method :create_zone
-
   private
 
   def max_greater_than_min
