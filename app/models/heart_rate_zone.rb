@@ -13,8 +13,6 @@ class HeartRateZone < ApplicationRecord
 
   scope :ordered, -> { order(:zone_number) }
 
-  private_class_method :create_zone
-
   DEFAULTS = [
     { zone_number: 1, name: "Récupération", color: "#3B82F6" },
     { zone_number: 2, name: "Endurance", color: "#22C55E" },
@@ -46,6 +44,8 @@ class HeartRateZone < ApplicationRecord
       zone.max_bpm = (max_hr * range[1]).round
     end
   end
+
+  private_class_method :create_zone
 
   private
 
