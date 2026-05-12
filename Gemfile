@@ -10,7 +10,9 @@ gem "puma", ">= 5.0"
 gem "rails", "~> 8.1.3"
 
 # ─── Frontend ─────────────────────────────────────────
+gem "haml-rails", "~> 3.0"
 gem "importmap-rails"
+gem "redcarpet", "~> 3.6"
 gem "stimulus-rails"
 gem "tailwindcss-rails"
 gem "turbo-rails"
@@ -42,23 +44,21 @@ gem "tzinfo-data", platforms: [:windows, :jruby]
 
 # ─── Development & Test ──────────────────────────────
 group :development, :test do
+  gem "brakeman", require: false
+  gem "bundler-audit", require: false
   gem "debug", platforms: [:mri, :windows], require: "debug/prelude"
-
-  # Test
+  gem "dotenv", "~> 3.2", groups: [:development, :test]
   gem "factory_bot_rails", "~> 6.4"
   gem "faker", "~> 3.5"
+  gem "haml_lint", "~> 0.73.0", require: false
+  gem "i18n-tasks", "~> 1.1"
+  gem "pry", "~> 0.16.0"
   gem "rspec-rails", "~> 8.0"
-
-  # Lint
   gem "rubocop", "~> 1.86", require: false
   gem "rubocop-factory_bot", "~> 2.28", require: false
   gem "rubocop-performance", "~> 1.26", require: false
   gem "rubocop-rails", "~> 2.34", require: false
   gem "rubocop-rspec", "~> 3.9", require: false
-
-  # Security
-  gem "brakeman", require: false
-  gem "bundler-audit", require: false
 end
 
 # ─── Development only ────────────────────────────────
@@ -75,13 +75,3 @@ group :test do
   gem "vcr", "~> 6.3"
   gem "webmock", "~> 3.24"
 end
-
-gem "haml-rails", "~> 3.0"
-
-gem "haml_lint", "~> 0.73.0", groups: [:development, :test], require: false
-
-gem "pry", "~> 0.16.0"
-
-gem "dotenv", "~> 3.2", groups: [:development, :test]
-
-gem "redcarpet", "~> 3.6"

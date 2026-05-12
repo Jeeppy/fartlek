@@ -20,7 +20,8 @@ class PlannedSessionsController < ApplicationController
     @planned_session = current_user.planned_sessions.build(session_params)
 
     if @planned_session.save
-      redirect_to week_path(date: @planned_session.date.beginning_of_week), notice: "Séance planifiée."
+      redirect_to week_path(date: @planned_session.date.beginning_of_week),
+                  notice: t("notices.planned_sessions.created")
     else
       render :new, status: :unprocessable_content
     end
@@ -28,7 +29,8 @@ class PlannedSessionsController < ApplicationController
 
   def update
     if @planned_session.update(session_params)
-      redirect_to week_path(date: @planned_session.date.beginning_of_week), notice: "Séance mise à jour."
+      redirect_to week_path(date: @planned_session.date.beginning_of_week),
+                  notice: t("notices.planned_sessions.updated")
     else
       render :edit, status: :unprocessable_content
     end
@@ -37,12 +39,13 @@ class PlannedSessionsController < ApplicationController
   def destroy
     week = @planned_session.date.beginning_of_week
     @planned_session.destroy
-    redirect_to week_path(date: week), notice: "Séance supprimée.", status: :see_other
+    redirect_to week_path(date: week), notice: t("notices.planned_sessions.destroyed"), status: :see_other
   end
 
   def complete
     @planned_session.update!(completed: true)
-    redirect_to week_path(date: @planned_session.date.beginning_of_week), notice: "Séance marquée comme faite."
+    redirect_to week_path(date: @planned_session.date.beginning_of_week),
+                notice: t("notices.planned_sessions.completed")
   end
 
   private

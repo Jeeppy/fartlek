@@ -13,6 +13,8 @@ class HeartRateZone < ApplicationRecord
 
   scope :ordered, -> { order(:zone_number) }
 
+  private_class_method :create_zone
+
   DEFAULTS = [
     { zone_number: 1, name: "Récupération", color: "#3B82F6" },
     { zone_number: 2, name: "Endurance", color: "#22C55E" },
@@ -21,23 +23,27 @@ class HeartRateZone < ApplicationRecord
     { zone_number: 5, name: "VO2max", color: "#EF4444" }
   ].freeze
 
-  def self.generate_defaults(user)
-    max_hr = user.estimated_max_hr
-    ranges = [
-      [0.50, 0.60],
-      [0.60, 0.70],
-      [0.70, 0.80],
-      [0.80, 0.90],
-      [0.90, 1.00]
-    ]
+  ZONE_RANGES = [
+    [0.50, 0.60],
+    [0.60, 0.70],
+    [0.70, 0.80],
+    [0.80, 0.90],
+    [0.90, 1.00]
+  ].freeze
 
-    DEFAULTS.each_with_index do |default, i|
-      user.heart_rate_zones.find_or_create_by!(zone_number: default[:zone_number]) do |zone|
-        zone.name = default[:name]
-        zone.color = default[:color]
-        zone.min_bpm = (max_hr * ranges[i][0]).round
-        zone.max_bpm = (max_hr * ranges[i][1]).round
-      end
+  def self.generate_defaults(user)
+    DEFAULTS.each_with_index do |default, index|
+      create_zone(user, default, ZONE_RANGES[index])
+    end
+  end
+
+  def self.create_zone(user, default, range)
+    max_hr = user.estimated_max_hr
+    user.heart_rate_zones.find_or_create_by!(zone_number: default[:zone_number]) do |zone|
+      zone.name = default[:name]
+      zone.color = default[:color]
+      zone.min_bpm = (max_hr * range[0]).round
+      zone.max_bpm = (max_hr * range[1]).round
     end
   end
 

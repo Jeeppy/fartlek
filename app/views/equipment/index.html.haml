@@ -9,49 +9,51 @@
   - if @active.any?
     .space-y-3
       - @active.each do |eq|
-        .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
-          .flex.items-center.justify-between
-            .flex.items-center.gap-4
-              %span.text-2xl= eq.shoes? ? "👟" : eq.bike? ? "🚲" : "🔧"
-              %div
-                %h3.text-sm.font-semibold.text-gray-100= eq.name
-                %p.text-xs.text-gray-400
-                  = [eq.brand, eq.model].compact.join(" ")
-                  - if eq.purchase_date
-                    = " — depuis #{l(eq.purchase_date, format: '%B %Y')}"
+        = link_to equipment_path(eq) do
+          .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800.hover:ring-gray-600.transition
+            .flex.items-center.justify-between
+              .flex.items-center.gap-4
+                %span.text-2xl= eq.shoes? ? "👟" : eq.bike? ? "🚲" : "🔧"
+                %div
+                  %h3.text-sm.font-semibold.text-gray-100= eq.name
+                  %p.text-xs.text-gray-400
+                    = [eq.brand, eq.model].compact.join(" ")
+                    - if eq.purchase_date
+                      = " — depuis #{l(eq.purchase_date, format: '%B %Y')}"
 
-            .flex.items-center.gap-8
-              -# Distance + barre de vie
-              .w-48
-                .flex.items-center.justify-between.mb-1
-                  %span.text-sm.font-medium.text-gray-100= "#{eq.total_distance_km} km"
+              .flex.items-center.gap-8
+                -# Distance + barre de vie
+                .w-48
+                  .flex.items-center.justify-between.mb-1
+                    %span.text-sm.font-medium.text-gray-100= "#{eq.total_distance_km} km"
+                    - if eq.usage_percent
+                      %span.text-xs{ class: eq.needs_replacement? ? "text-red-400" : "text-gray-500" }
+                        = "#{eq.usage_percent}%"
                   - if eq.usage_percent
-                    %span.text-xs{ class: eq.needs_replacement? ? "text-red-400" : "text-gray-500" }
-                      = "#{eq.usage_percent}%"
-                - if eq.usage_percent
-                  .h-2.w-full.rounded-full.bg-gray-800
-                    .h-2.rounded-full{ style: "width: #{[eq.usage_percent, 100].min}%", class: eq.needs_replacement? ? "bg-red-500" : "bg-indigo-500" }
-                - if eq.max_distance_meters&.positive?
-                  %p.text-xs.text-gray-500.mt-1
-                    = "sur #{(eq.max_distance_meters / 1000.0).round(0)} km"
+                    .h-2.w-full.rounded-full.bg-gray-800
+                      .h-2.rounded-full{ style: "width: #{[eq.usage_percent, 100].min}%", class: eq.needs_replacement? ? "bg-red-500" : "bg-indigo-500" }
+                  - if eq.max_distance_meters&.positive?
+                    %p.text-xs.text-gray-500.mt-1
+                      = "sur #{(eq.max_distance_meters / 1000.0).round(0)} km"
 
-              -# Actions alignées
-              .flex.items-center.gap-3.w-28.justify-end
-                = link_to "Modifier", edit_equipment_path(eq), class: "text-indigo-400 hover:text-indigo-300 text-xs leading-none"
-                = link_to "Suppr.", equipment_path(eq), data: { turbo_method: :delete, turbo_confirm: "Supprimer ?" }, class: "text-red-400 hover:text-red-300 text-xs leading-none"
+                -# Actions alignées
+                .flex.items-center.gap-3.w-28.justify-end
+                  = link_to "Modifier", edit_equipment_path(eq), class: "text-indigo-400 hover:text-indigo-300 text-xs leading-none"
+                  = link_to "Suppr.", equipment_path(eq), data: { turbo_method: :delete, turbo_confirm: "Supprimer ?" }, class: "text-red-400 hover:text-red-300 text-xs leading-none"
 
   - if @retired.any?
     %h2.text-lg.font-medium.text-gray-400.mt-8 Retiré
     .space-y-3
       - @retired.each do |eq|
-        .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800.opacity-60
-          .flex.items-center.justify-between
-            .flex.items-center.gap-4
-              %span.text-2xl= eq.shoes? ? "👟" : "🔧"
-              %div
-                %h3.text-sm.font-semibold.text-gray-100= eq.name
-                %span.text-xs.text-gray-400= "#{eq.total_distance_km} km au total"
-            = link_to "Modifier", edit_equipment_path(eq), class: "text-indigo-400 hover:text-indigo-300 text-xs"
+        = link_to equipment_path(eq) do
+          .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800.opacity-60.hover:ring-gray-600.transition
+            .flex.items-center.justify-between
+              .flex.items-center.gap-4
+                %span.text-2xl= eq.shoes? ? "👟" : "🔧"
+                %div
+                  %h3.text-sm.font-semibold.text-gray-100= eq.name
+                  %span.text-xs.text-gray-400= "#{eq.total_distance_km} km au total"
+              = link_to "Modifier", edit_equipment_path(eq), class: "text-indigo-400 hover:text-indigo-300 text-xs"
 
   - if @active.empty? && @retired.empty?
     .rounded-lg.bg-gray-900.px-6.py-12.text-center.ring-1.ring-gray-800

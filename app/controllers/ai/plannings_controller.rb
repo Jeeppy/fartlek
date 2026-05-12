@@ -20,7 +20,7 @@ module Ai
 
     def destroy
       current_conversation&.destroy
-      redirect_to ai_planning_path, notice: "Conversation réinitialisée."
+      redirect_to ai_planning_path, notice: t("notices.ai.conversation_reset")
     end
 
     private

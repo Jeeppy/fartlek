@@ -20,7 +20,7 @@ class WeeklyJournalsController < ApplicationController
     @journal = current_user.weekly_journals.build(journal_params)
 
     if @journal.save
-      redirect_to week_path(date: @journal.week_start_date), notice: "Bilan enregistré."
+      redirect_to week_path(date: @journal.week_start_date), notice: t("notices.weekly_journals.created")
     else
       render :new, status: :unprocessable_content
     end
@@ -28,7 +28,7 @@ class WeeklyJournalsController < ApplicationController
 
   def update
     if @journal.update(journal_params)
-      redirect_to week_path(date: @journal.week_start_date), notice: "Bilan mis à jour."
+      redirect_to week_path(date: @journal.week_start_date), notice: t("notices.weekly_journals.updated")
     else
       render :edit, status: :unprocessable_content
     end

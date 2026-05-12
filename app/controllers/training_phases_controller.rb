@@ -17,7 +17,7 @@ class TrainingPhasesController < ApplicationController
     @phase = current_user.training_phases.build(phase_params)
 
     if @phase.save
-      redirect_to training_phases_path, notice: "Phase créée."
+      redirect_to training_phases_path, notice: t("notices.training_phases.created")
     else
       render :new, status: :unprocessable_content
     end
@@ -25,7 +25,7 @@ class TrainingPhasesController < ApplicationController
 
   def update
     if @phase.update(phase_params)
-      redirect_to training_phases_path, notice: "Phase mise à jour."
+      redirect_to training_phases_path, notice: t("notices.training_phases.updated")
     else
       render :edit, status: :unprocessable_content
     end
@@ -33,7 +33,7 @@ class TrainingPhasesController < ApplicationController
 
   def destroy
     @phase.destroy
-    redirect_to training_phases_path, notice: "Phase supprimée.", status: :see_other
+    redirect_to training_phases_path, notice: t("notices.training_phases.destroyed"), status: :see_other
   end
 
   private

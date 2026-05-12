@@ -14,7 +14,7 @@ module Settings
       @zone = current_user.pace_zones.find(params[:id])
 
       if @zone.update(zone_params)
-        redirect_to settings_pace_zones_path, notice: "Zone mise à jour."
+        redirect_to settings_pace_zones_path, notice: t("notices.settings.zone_updated")
       else
         @zones = current_user.pace_zones.ordered
         render :index, status: :unprocessable_content
@@ -23,7 +23,7 @@ module Settings
 
     def generate
       PaceZone.generate_defaults(current_user)
-      redirect_to settings_pace_zones_path, notice: "Zones d'allure générées."
+      redirect_to settings_pace_zones_path, notice: t("notices.settings.pace_zones_generated")
     end
 
     private

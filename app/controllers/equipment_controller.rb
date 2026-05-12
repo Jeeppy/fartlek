@@ -20,7 +20,7 @@ class EquipmentController < ApplicationController
     @equipment = current_user.equipments.build(equipment_params)
 
     if @equipment.save
-      redirect_to equipment_index_path, notice: "Équipement ajouté."
+      redirect_to equipment_index_path, notice: t("notices.equipment.created")
     else
       render :new, status: :unprocessable_content
     end
@@ -28,7 +28,7 @@ class EquipmentController < ApplicationController
 
   def update
     if @equipment.update(equipment_params)
-      redirect_to equipment_index_path, notice: "Équipement mis à jour."
+      redirect_to equipment_index_path, notice: t("notices.equipment.updated")
     else
       render :edit, status: :unprocessable_content
     end
@@ -36,7 +36,7 @@ class EquipmentController < ApplicationController
 
   def destroy
     @equipment.destroy
-    redirect_to equipment_index_path, notice: "Équipement supprimé.", status: :see_other
+    redirect_to equipment_index_path, notice: t("notices.equipment.destroyed"), status: :see_other
   end
 
   private

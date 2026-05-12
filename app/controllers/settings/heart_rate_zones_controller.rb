@@ -14,7 +14,7 @@ module Settings
       @zone = current_user.heart_rate_zones.find(params[:id])
 
       if @zone.update(zone_params)
-        redirect_to settings_heart_rate_zones_path, notice: "Zone mise à jour."
+        redirect_to settings_heart_rate_zones_path, notice: t("notices.settings.zone_updated")
       else
         @zones = current_user.heart_rate_zones.ordered
         render :index, status: :unprocessable_content

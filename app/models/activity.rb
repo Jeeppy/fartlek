@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Activity < ApplicationRecord
+  include SportIcon
+
   belongs_to :user
   belongs_to :equipment, optional: true
   has_many :activity_laps, dependent: :destroy
@@ -55,16 +57,6 @@ class Activity < ApplicationRecord
     minutes = average_pace_seconds_per_km / 60
     secs = average_pace_seconds_per_km % 60
     format("%<m>d:%<s>02d /km", m: minutes, s: secs)
-  end
-
-  def sport_icon
-    case sport
-    when "running"  then "🏃"
-    when "cycling"  then "🚴"
-    when "walking"  then "🚶"
-    when "swimming" then "🏊"
-    when "ppg"      then "💪"
-    end
   end
 
   def from_strava?

@@ -7,6 +7,6 @@ class ActivityTagsController < ApplicationController
 
   def generate
     ActivityTag.generate_defaults(current_user)
-    redirect_to activity_tags_path, notice: "Tags par défaut générés."
+    redirect_to activity_tags_path, notice: t("notices.activity_tags.generated")
   end
 end

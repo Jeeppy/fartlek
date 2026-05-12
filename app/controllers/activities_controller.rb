@@ -28,7 +28,7 @@ class ActivitiesController < ApplicationController
 
     if @activity.save
       link_planned_session
-      redirect_to @activity, notice: "Activité créée."
+      redirect_to @activity, notice: t("notices.activities.created")
     else
       render :new, status: :unprocessable_content
     end
@@ -37,7 +37,7 @@ class ActivitiesController < ApplicationController
   def update
     if @activity.update(activity_params)
       link_planned_session
-      redirect_to @activity, notice: "Activité mise à jour."
+      redirect_to @activity, notice: t("notices.activities.updated")
     else
       render :edit, status: :unprocessable_content
     end
@@ -45,7 +45,7 @@ class ActivitiesController < ApplicationController
 
   def destroy
     @activity.destroy
-    redirect_to activities_path, notice: "Activité supprimée.", status: :see_other
+    redirect_to activities_path, notice: t("notices.activities.destroyed"), status: :see_other
   end
 
   def update_rpe

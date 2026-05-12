@@ -8,9 +8,10 @@ module ActivityTagsHelper
   }.freeze
 
   def grouped_tags(tags)
-    TAG_GROUPS.map do |group_name, tag_names|
+    groups = TAG_GROUPS.map do |group_name, tag_names|
       group_tags = tags.select { |t| tag_names.include?(t.name) }
       [group_name, group_tags]
-    end.reject { |_, t| t.empty? }
+    end
+    groups.reject { |_, group_tags| group_tags.empty? }
   end
 end

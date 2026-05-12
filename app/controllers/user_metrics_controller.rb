@@ -24,7 +24,7 @@ class UserMetricsController < ApplicationController
     @metric.unit ||= UserMetric.default_unit(@metric.metric_type)
 
     if @metric.save
-      redirect_to user_metrics_path(type: @metric.metric_type), notice: "Mesure enregistrée."
+      redirect_to user_metrics_path(type: @metric.metric_type), notice: t("notices.user_metrics.created")
     else
       render :new, status: :unprocessable_content
     end
@@ -32,7 +32,7 @@ class UserMetricsController < ApplicationController
 
   def update
     if @metric.update(metric_params)
-      redirect_to user_metrics_path(type: @metric.metric_type), notice: "Mesure mise à jour."
+      redirect_to user_metrics_path(type: @metric.metric_type), notice: t("notices.user_metrics.updated")
     else
       render :edit, status: :unprocessable_content
     end
@@ -41,7 +41,7 @@ class UserMetricsController < ApplicationController
   def destroy
     type = @metric.metric_type
     @metric.destroy
-    redirect_to user_metrics_path(type: type), notice: "Mesure supprimée.", status: :see_other
+    redirect_to user_metrics_path(type: type), notice: t("notices.user_metrics.destroyed"), status: :see_other
   end
 
   private

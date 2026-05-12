@@ -75,8 +75,8 @@ fr:
       default: "%d/%m/%Y"
       short: "%d %b"
       long: "%A %d %B %Y"
-    day_names: [ Dimanche, Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi ]
-    abbr_day_names: [ Dim, Lun, Mar, Mer, Jeu, Ven, Sam ]
+    day_names: [Dimanche, Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi]
+    abbr_day_names: [Dim, Lun, Mar, Mer, Jeu, Ven, Sam]
     month_names:
       [
         ~,
@@ -93,7 +93,8 @@ fr:
         Novembre,
         Décembre,
       ]
-    abbr_month_names: [ ~, Jan, Fév, Mar, Avr, Mai, Jun, Jul, Aoû, Sep, Oct, Nov, Déc ]
+    abbr_month_names:
+      [~, Jan, Fév, Mar, Avr, Mai, Jun, Jul, Aoû, Sep, Oct, Nov, Déc]
   time:
     formats:
       default: "%d/%m/%Y %H:%M"
@@ -105,3 +106,50 @@ fr:
     vma_test: "Test VMA"
     vo2max: "VO2max"
     body_fat: "Masse grasse"
+  notices:
+    activities:
+      created: "Activité créée."
+      updated: "Activité mise à jour."
+      destroyed: "Activité supprimée."
+    activity_tags:
+      generated: "Tags par défaut générés."
+    ai:
+      analysis_created: "Analyse générée."
+      conversation_reset: "Conversation réinitialisée."
+    competitions:
+      created: "Compétition créée."
+      updated: "Compétition mise à jour."
+      destroyed: "Compétition supprimée."
+    daily_journals:
+      created: "Journal enregistré."
+      updated: "Journal mis à jour."
+    equipment:
+      created: "Équipement ajouté."
+      updated: "Équipement mis à jour."
+      destroyed: "Équipement supprimé."
+    planned_sessions:
+      created: "Séance planifiée."
+      updated: "Séance mise à jour."
+      destroyed: "Séance supprimée."
+      completed: "Séance marquée comme faite."
+    settings:
+      zone_updated: "Zone mise à jour."
+      pace_zones_generated: "Zones d'allure générées."
+      strava_disconnected: "Strava déconnecté."
+      strava_sync_started: "Synchronisation lancée."
+      strava_connected: "Strava connecté. Synchronisation en cours."
+    training_phases:
+      created: "Phase créée."
+      updated: "Phase mise à jour."
+      destroyed: "Phase supprimée."
+    user_metrics:
+      created: "Mesure enregistrée."
+      updated: "Mesure mise à jour."
+      destroyed: "Mesure supprimée."
+    weekly_journals:
+      created: "Bilan enregistré."
+      updated: "Bilan mis à jour."
+  alerts:
+    strava:
+      no_code: "Connexion Strava échouée."
+      not_connected: "Aucun compte Strava connecté."

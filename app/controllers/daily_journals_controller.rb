@@ -20,7 +20,7 @@ class DailyJournalsController < ApplicationController
     @journal = current_user.daily_journals.build(journal_params)
 
     if @journal.save
-      redirect_to daily_journal_path(date: @journal.date), notice: "Journal enregistré."
+      redirect_to daily_journal_path(date: @journal.date), notice: t("notices.daily_journals.created")
     else
       render :new, status: :unprocessable_content
     end
@@ -28,7 +28,7 @@ class DailyJournalsController < ApplicationController
 
   def update
     if @journal.update(journal_params)
-      redirect_to daily_journal_path(date: @journal.date), notice: "Journal mis à jour."
+      redirect_to daily_journal_path(date: @journal.date), notice: t("notices.daily_journals.updated")
     else
       render :edit, status: :unprocessable_content
     end

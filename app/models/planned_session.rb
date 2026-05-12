@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class PlannedSession < ApplicationRecord
+  include SportIcon
+
   belongs_to :user
   belongs_to :activity, optional: true
 
@@ -17,16 +19,6 @@ class PlannedSession < ApplicationRecord
 
   def completed?
     completed || activity.present?
-  end
-
-  def sport_icon
-    case sport
-    when "running"  then "🏃"
-    when "cycling"  then "🚴"
-    when "walking"  then "🚶"
-    when "swimming" then "🏊"
-    when "ppg"      then "💪"
-    end
   end
 
   def target_duration_formatted

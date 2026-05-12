@@ -12,7 +12,7 @@
         = render "activity_card", activity: activity
 
     - if @pagy.pages > 1
-      .mt-6
+      .mt-6.flex.justify-center
         = pagy_dark_nav(@pagy)
   - else
     .rounded-lg.bg-gray-900.px-6.py-12.text-center.ring-1.ring-gray-800

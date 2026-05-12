@@ -9,7 +9,7 @@ module Ai
 
       begin
         ::Ai::ActivityAnalyzer.new(@activity, current_user).call
-        redirect_to activity_path(@activity), notice: "Analyse générée."
+        redirect_to activity_path(@activity), notice: t("notices.ai.analysis_created")
       rescue ::Ai::BaseService::ApiError => e
         redirect_to activity_path(@activity), alert: "Erreur API : #{e.message}"
       end

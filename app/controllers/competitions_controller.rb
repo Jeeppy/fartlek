@@ -20,7 +20,7 @@ class CompetitionsController < ApplicationController
     @competition = current_user.competitions.build(competition_params)
 
     if @competition.save
-      redirect_to @competition, notice: "Compétition créée."
+      redirect_to @competition, notice: t("notices.competitions.created")
     else
       render :new, status: :unprocessable_content
     end
@@ -28,7 +28,7 @@ class CompetitionsController < ApplicationController
 
   def update
     if @competition.update(competition_params)
-      redirect_to @competition, notice: "Compétition mise à jour."
+      redirect_to @competition, notice: t("notices.competitions.updated")
     else
       render :edit, status: :unprocessable_content
     end
@@ -36,7 +36,7 @@ class CompetitionsController < ApplicationController
 
   def destroy
     @competition.destroy
-    redirect_to competitions_path, notice: "Compétition supprimée.", status: :see_other
+    redirect_to competitions_path, notice: t("notices.competitions.destroyed"), status: :see_other
   end
 
   private
