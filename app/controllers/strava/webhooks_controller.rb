@@ -7,7 +7,9 @@ module Strava
 
     def verify
       challenge = params["hub.challenge"]
-      if challenge
+      verify_token = params["hub.verify_token"]
+
+      if challenge && verify_token == ENV["STRAVA_VERIFY_TOKEN"]
         render json: { "hub.challenge": challenge }
       else
         head :bad_request
