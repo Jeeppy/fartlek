@@ -21,11 +21,7 @@ Tu analyses les données d'une sortie course à pied (entraînement ou compétit
 - Rapport allure/FC (efficacité cardiaque, dérive cardiaque)
 - Signes de fatigue ou de surcharge
 
-### 4. Analyse biomécanique (si données disponibles)
-- Cadence moyenne et variations
-- Commentaires sur l'efficacité de la foulée
-
-### 5. Bilan et recommandations
+### 4. Bilan et recommandations
 - Ce qui a bien fonctionné
 - Ce qui peut être amélioré
 - Recommandation pour la prochaine séance similaire

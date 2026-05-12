@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static values = { laps: Array };
+  static values = { laps: Array, hrZones: Array, paceZones: Array };
   static targets = ["canvas", "tab"];
 
   connect() {
@@ -55,8 +55,14 @@ export default class extends Controller {
             data: config.invert
               ? rawValues.map((v) => (v ? config.max - v : null))
               : rawValues,
-            backgroundColor: `${config.color}80`,
-            borderColor: config.color,
+            backgroundColor: config.colorFn
+              ? rawValues.map((v) => (v ? config.colorFn(v) : "#374151"))
+              : `${config.color}80`,
+            borderColor: config.colorFn
+              ? rawValues.map((v) =>
+                  v ? config.colorFn(v).slice(0, 7) : "#374151",
+                )
+              : config.color,
             borderWidth: 1,
             borderRadius: 4,
           },
@@ -103,6 +109,13 @@ export default class extends Controller {
       return `${m}:${sec.toString().padStart(2, "0")} /km`;
     };
 
+    const getZoneColor = (zones, value, invert = false) => {
+      if (!zones || zones.length === 0) return null;
+      const v = invert ? value : value;
+      const zone = zones.find((z) => v >= z.min && v <= z.max);
+      return zone ? zone.color + "cc" : null;
+    };
+
     const configs = {
       pace: {
         key: "pace",
@@ -110,27 +123,30 @@ export default class extends Controller {
         invert: true,
         max: Math.max(...this.lapsValue.map((l) => l.pace || 0)) + 30,
         format: formatPace,
+        colorFn: (raw) => getZoneColor(this.paceZonesValue, raw) || "#818cf8cc",
       },
       hr: {
         key: "hr",
         color: "#ef4444",
         invert: false,
         format: (v) => `${v} bpm`,
+        colorFn: (raw) => getZoneColor(this.hrZonesValue, raw) || "#ef4444cc",
       },
       cadence: {
         key: "cadence",
         color: "#22c55e",
         invert: false,
         format: (v) => `${v} spm`,
+        colorFn: null,
       },
       power: {
         key: "power",
         color: "#f59e0b",
         invert: false,
         format: (v) => `${v} W`,
+        colorFn: null,
       },
     };
-
     return configs[this.currentMetric];
   }
 }

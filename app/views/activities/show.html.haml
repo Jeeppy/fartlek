@@ -222,14 +222,16 @@
           %span.text-xs.text-gray-500= "#{@activity.activity_laps.count} segments"
 
       -# Lap chart
-      - laps_data = @activity.activity_laps.ordered.map { |l| { number: l.lap_number, pace: l.average_pace_seconds_per_km, hr: l.average_heart_rate, cadence: l.average_cadence, power: l.average_power } }
+      - hr_zones = current_user.heart_rate_zones.ordered.map { |z| { min: z.min_bpm, max: z.max_bpm, color: z.color } }
+      - pace_zones = current_user.pace_zones.ordered.map { |z| { min: z.min_pace_seconds_per_km, max: z.max_pace_seconds_per_km, color: z.color } }
+      - laps_data = @activity.activity_laps.ordered.map { |l| { number: l.lap_number, pace: l.average_pace_seconds_per_km, hr: l.average_heart_rate, cadence: l.average_cadence, power: l.average_power, duration_seconds: l.duration_seconds } }
       - show_pace = laps_data.any? { |l| l[:pace].present? } && %w[running cycling walking].include?(@activity.sport)
       - has_hr = laps_data.any? { |l| l[:hr].present? }
       - has_cadence = laps_data.any? { |l| l[:cadence].present? }
       - has_power = laps_data.any? { |l| l[:power].present? }
 
       - if show_pace || has_hr || has_cadence || has_power
-        .px-5.py-4.border-b.border-gray-800{ data: { controller: "lap-chart", lap_chart_laps_value: laps_data.to_json } }
+        .px-5.py-4.border-b.border-gray-800{ data: { controller: "lap-chart", lap_chart_laps_value: laps_data.to_json, lap_chart_hr_zones_value: hr_zones.to_json, lap_chart_pace_zones_value: pace_zones.to_json } }
           .flex.gap-2.mb-4
             - if show_pace
               %button.px-3.py-1.rounded-lg.text-xs.font-medium.bg-indigo-600.text-white{ data: { action: "click->lap-chart#switch", lap_chart_target: "tab", metric: "pace" } } Allure
