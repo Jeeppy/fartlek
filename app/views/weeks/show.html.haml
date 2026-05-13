@@ -4,11 +4,14 @@
   .space-y-6
     -# Navigation + Score
     .flex.items-center.justify-between
-      = link_to week_path(date: @prev_week), class: "rounded-lg bg-gray-900 px-3 py-2 text-sm text-gray-400 ring-1 ring-gray-800 hover:bg-gray-800" do
+      = link_to week_path(date: @prev_week), class: "rounded-lg bg-gray-900 px-3 py-2 text-sm text-gray-400 ring-1 ring-gray-800 hover:bg-gray-800 shrink-0" do
         ← Précédente
-      .flex.items-center.gap-4
-        %h1.text-lg.font-semibold.text-gray-100
-          Semaine du #{l(@start_of_week, format: "%d")} au #{l(@end_of_week, format: "%d %B %Y")}
+      .flex.flex-col.items-center.gap-1.min-w-0
+        %h1.text-base.font-semibold.text-gray-100.text-center
+          %span.hidden.md:inline
+            Semaine du #{l(@start_of_week, format: "%d")} au #{l(@end_of_week, format: "%d %B %Y")}
+          %span.inline.md:hidden
+            #{l(@start_of_week, format: "%d/%m")} au #{l(@end_of_week, format: "%d/%m")}
         - score = @week_analysis[:score]
         - badge_color = case score[:level]
         - when :balanced then "#22c55e"
@@ -18,13 +21,13 @@
         - when :balanced then "Équilibrée"
         - when :loaded then "Chargée"
         - else; "Risquée"
-        %span.rounded.px-2.py-1.text-xs.font-medium.text-gray-100{ style: "background-color: #{badge_color}30; border-left: 3px solid #{badge_color}" }
+        %span.rounded.px-2.py-0.5.text-xs.font-medium.text-gray-100{ style: "background-color: #{badge_color}30; border-left: 3px solid #{badge_color}" }
           = badge_label
-      = link_to week_path(date: @next_week), class: "rounded-lg bg-gray-900 px-3 py-2 text-sm text-gray-400 ring-1 ring-gray-800 hover:bg-gray-800" do
+      = link_to week_path(date: @next_week), class: "rounded-lg bg-gray-900 px-3 py-2 text-sm text-gray-400 ring-1 ring-gray-800 hover:bg-gray-800 shrink-0" do
         Suivante →
 
     -# Analyse + Stats semaine
-    .grid.grid-cols-2.gap-4
+    .grid.grid-cols-1.gap-4.md:grid-cols-2
       -# Analyse
       .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
         %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.mb-3 Analyse
@@ -46,7 +49,7 @@
       .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
         %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.mb-3 Indicateurs
         - stats = @week_analysis[:stats]
-        .grid.grid-cols-4.gap-3
+        .grid.grid-cols-2.gap-3.md:grid-cols-4
           %div
             %dt.text-xs.text-gray-500 RPE moy
             %dd.text-lg.font-bold.text-gray-100= stats[:avg_rpe] || "—"
@@ -65,86 +68,125 @@
     -# Résumé par discipline
     = render "summary_table"
 
-    -# Grille horizontale par jour
-    .rounded-lg.bg-gray-900.ring-1.ring-gray-800
-      .grid.grid-cols-7
-        -# Headers avec indicateur intensité
-        - @week_analysis[:daily_load].each do |day_data|
-          - today = day_data[:date] == Date.current
-          - intensity_color = case day_data[:intensity]
-          - when :hard then "border-red-500"
-          - when :moderate then "border-orange-500"
-          - when :easy then "border-green-500"
-          - else; "border-gray-800"
-          .px-3.py-2.border-b-2.text-center{ class: "#{today ? 'bg-gray-800' : ''} #{intensity_color}" }
-            %p.text-xs.font-medium{ class: today ? "text-indigo-400" : "text-gray-500" }
-              = l(day_data[:date], format: "%a").capitalize
-            %p.text-sm.font-medium{ class: today ? "text-indigo-400" : "text-gray-300" }
-              = day_data[:date].day
-            - if day_data[:rpe]
-              %p.text-xs{ class: day_data[:rpe] >= 7 ? "text-red-400" : day_data[:rpe] >= 5 ? "text-orange-400" : "text-green-400" }
-                RPE #{day_data[:rpe]}
+    -# Grille horizontale par jour - desktop
+    .hidden.md:block
+      .rounded-lg.bg-gray-900.ring-1.ring-gray-800
+        .grid.grid-cols-7
+          -# Headers avec indicateur intensité
+          - @week_analysis[:daily_load].each do |day_data|
+            - today = day_data[:date] == Date.current
+            - intensity_color = case day_data[:intensity]
+            - when :hard then "border-red-500"
+            - when :moderate then "border-orange-500"
+            - when :easy then "border-green-500"
+            - else; "border-gray-800"
+            .px-3.py-2.border-b-2.text-center{ class: "#{today ? 'bg-gray-800' : ''} #{intensity_color}" }
+              %p.text-xs.font-medium{ class: today ? "text-indigo-400" : "text-gray-500" }
+                = l(day_data[:date], format: "%a").capitalize
+              %p.text-sm.font-medium{ class: today ? "text-indigo-400" : "text-gray-300" }
+                = day_data[:date].day
+              - if day_data[:rpe]
+                %p.text-xs{ class: day_data[:rpe] >= 7 ? "text-red-400" : day_data[:rpe] >= 5 ? "text-orange-400" : "text-green-400" }
+                  RPE #{day_data[:rpe]}
 
-        -# Contenu par jour
+          -# Contenu par jour
+          - (@start_of_week..@end_of_week).each do |day|
+            - today = day == Date.current
+            - day_activities = @activities.select { |a| a.performed_at.to_date == day }
+            - day_planned = @planned_sessions.select { |p| p.date == day }
+            - day_data = @week_analysis[:daily_load].find { |d| d[:date] == day }
+            .px-2.py-2.border-r.border-gray-800.min-h-32{ class: "last:border-r-0 #{today ? 'bg-gray-800/50' : ''}" }
+              .space-y-2
+                -# Séances planifiées
+                - day_planned.each do |planned|
+                  - status = @week_analysis[:daily_load].find { |d| d[:date] == day }&.dig(:status)
+                  - missed = status == :missed && !planned.completed?
+                  = link_to planned_session_path(planned), data: { turbo_frame: "slideover_content" }, class: "block rounded-md p-2 ring-1 overflow-hidden cursor-pointer #{planned.completed? ? 'bg-green-950/30 ring-green-800 border-l-2 border-l-green-500' : missed ? 'bg-red-950/30 ring-red-800 border-l-2 border-l-red-500' : 'bg-gray-800/50 ring-gray-700 border-dashed border-l-2 border-l-gray-600'}" do
+                    .flex.items-center.gap-1
+                      %span.text-sm.shrink-0= planned.sport_icon
+                      %span.text-xs.font-medium.truncate.min-w-0{ class: planned.completed? ? 'text-green-300' : missed ? 'text-red-300 line-through' : 'text-gray-300' }
+                        = planned.title
+                    .mt-1.text-xs.text-gray-500
+                      - parts = []
+                      - parts << "#{(planned.target_distance_meters / 1000.0).round(1)}km" if planned.target_distance_meters
+                      - parts << planned.target_duration_formatted if planned.target_duration_formatted
+                      - parts << "RPE #{planned.target_rpe}" if planned.target_rpe
+                      = parts.join(" · ")
+                    -# Comparaison prévu vs réel
+                    - matched = planned.activity
+                    - if matched
+                      .mt-1.text-xs
+                        - if matched.distance_km && planned.target_distance_meters
+                          - target_km = (planned.target_distance_meters / 1000.0).round(1)
+                          %span{ class: matched.distance_km >= target_km ? "text-green-400" : "text-orange-400" }
+                            = "#{matched.distance_km}/#{target_km}km"
+                        - if matched.rpe && planned.target_rpe
+                          - rpe_ok = matched.rpe <= planned.target_rpe + 1
+                          %span.ml-1{ class: rpe_ok ? "text-green-400" : "text-orange-400" }
+                            = "RPE #{matched.rpe}/#{planned.target_rpe}"
+                        - elsif matched.rpe
+                          %span.ml-1.text-gray-500= "RPE #{matched.rpe}"
+                    - if missed
+                      .mt-1.text-xs.text-red-400 Manquée
+
+                -# Activités non planifiées
+                - unplanned = day_activities.select { |a| a.planned_session.nil? }
+                - unplanned.each do |activity|
+                  = link_to activity_path(activity), class: "block rounded-md p-2 bg-gray-800 ring-1 ring-gray-700 hover:ring-gray-600 transition" do
+                    .flex.items-center.gap-1.5
+                      %span.text-sm= activity.sport_icon
+                      %span.text-xs.font-medium.text-gray-100.truncate= activity.title.presence || activity.sport.humanize
+                      %span.inline-flex.items-center.rounded.px-1.py-0.5.text-xs.bg-blue-950.text-blue-300{ style: "font-size: 0.5rem" } extra
+                    .mt-1.flex.flex-wrap.gap-x-3.gap-y-0.5.text-xs.text-gray-400
+                      - if activity.distance_km
+                        %span= "#{activity.distance_km}km"
+                      - if activity.duration_formatted
+                        %span= activity.duration_formatted
+                      - if activity.rpe
+                        %span= "RPE #{activity.rpe}"
+
+                -# Repos
+                - if day_activities.empty? && day_planned.empty?
+                  .flex.items-center.justify-center.h-full
+                    %span.text-xs.text-gray-600.italic Repos
+
+    -# Vue liste - mobile
+    .block.md:hidden
+      .space-y-2
         - (@start_of_week..@end_of_week).each do |day|
           - today = day == Date.current
           - day_activities = @activities.select { |a| a.performed_at.to_date == day }
           - day_planned = @planned_sessions.select { |p| p.date == day }
-          - day_data = @week_analysis[:daily_load].find { |d| d[:date] == day }
-          .px-2.py-2.border-r.border-gray-800.min-h-32{ class: "last:border-r-0 #{today ? 'bg-gray-800/50' : ''}" }
-            .space-y-2
-              -# Séances planifiées
+          - next if day_activities.empty? && day_planned.empty? && day != Date.current
+          .rounded-lg.bg-gray-900.ring-1.ring-gray-800.overflow-hidden
+            .flex.items-center.gap-2.px-4.py-2.border-b.border-gray-800{ class: today ? "bg-gray-800" : "" }
+              %span.text-xs.font-medium{ class: today ? "text-indigo-400" : "text-gray-400" }
+                = l(day, format: "%A %d %B").capitalize
+              - day_data = @week_analysis[:daily_load].find { |d| d[:date] == day }
+              - if day_data&.dig(:rpe)
+                %span.text-xs{ class: day_data[:rpe] >= 7 ? "text-red-400" : day_data[:rpe] >= 5 ? "text-orange-400" : "text-green-400" }
+                  RPE #{day_data[:rpe]}
+            .px-4.py-3.space-y-2
               - day_planned.each do |planned|
                 - status = @week_analysis[:daily_load].find { |d| d[:date] == day }&.dig(:status)
                 - missed = status == :missed && !planned.completed?
-                = link_to planned_session_path(planned), data: { turbo_frame: "slideover_content" }, class: "block rounded-md p-2 ring-1 overflow-hidden cursor-pointer #{planned.completed? ? 'bg-green-950/30 ring-green-800 border-l-2 border-l-green-500' : missed ? 'bg-red-950/30 ring-red-800 border-l-2 border-l-red-500' : 'bg-gray-800/50 ring-gray-700 border-dashed border-l-2 border-l-gray-600'}" do
-                  .flex.items-center.gap-1
-                    %span.text-sm.shrink-0= planned.sport_icon
-                    %span.text-xs.font-medium.truncate.min-w-0{ class: planned.completed? ? 'text-green-300' : missed ? 'text-red-300 line-through' : 'text-gray-300' }
-                      = planned.title
-                  .mt-1.text-xs.text-gray-500
-                    - parts = []
-                    - parts << "#{(planned.target_distance_meters / 1000.0).round(1)}km" if planned.target_distance_meters
-                    - parts << planned.target_duration_formatted if planned.target_duration_formatted
-                    - parts << "RPE #{planned.target_rpe}" if planned.target_rpe
-                    = parts.join(" · ")
-                  -# Comparaison prévu vs réel
-                  - matched = planned.activity
-                  - if matched
-                    .mt-1.text-xs
-                      - if matched.distance_km && planned.target_distance_meters
-                        - target_km = (planned.target_distance_meters / 1000.0).round(1)
-                        %span{ class: matched.distance_km >= target_km ? "text-green-400" : "text-orange-400" }
-                          = "#{matched.distance_km}/#{target_km}km"
-                      - if matched.rpe && planned.target_rpe
-                        - rpe_ok = matched.rpe <= planned.target_rpe + 1
-                        %span.ml-1{ class: rpe_ok ? "text-green-400" : "text-orange-400" }
-                          = "RPE #{matched.rpe}/#{planned.target_rpe}"
-                      - elsif matched.rpe
-                        %span.ml-1.text-gray-500= "RPE #{matched.rpe}"
-                  - if missed
-                    .mt-1.text-xs.text-red-400 Manquée
-
-              -# Activités non planifiées
-              - unplanned = day_activities.select { |a| a.planned_session.nil? }
-              - unplanned.each do |activity|
-                = link_to activity_path(activity), class: "block rounded-md p-2 bg-gray-800 ring-1 ring-gray-700 hover:ring-gray-600 transition" do
-                  .flex.items-center.gap-1.5
-                    %span.text-sm= activity.sport_icon
-                    %span.text-xs.font-medium.text-gray-100.truncate= activity.title.presence || activity.sport.humanize
-                    %span.inline-flex.items-center.rounded.px-1.py-0.5.text-xs.bg-blue-950.text-blue-300{ style: "font-size: 0.5rem" } extra
-                  .mt-1.flex.flex-wrap.gap-x-3.gap-y-0.5.text-xs.text-gray-400
-                    - if activity.distance_km
-                      %span= "#{activity.distance_km}km"
-                    - if activity.duration_formatted
-                      %span= activity.duration_formatted
-                    - if activity.rpe
-                      %span= "RPE #{activity.rpe}"
-
-              -# Repos
+                = link_to planned_session_path(planned), data: { turbo_frame: "slideover_content" }, class: "block rounded-md p-2 ring-1 #{planned.completed? ? 'bg-green-950/30 ring-green-800' : missed ? 'bg-red-950/30 ring-red-800' : 'bg-gray-800/50 ring-gray-700'}" do
+                  .flex.items-center.justify-between
+                    .flex.items-center.gap-2
+                      %span= planned.sport_icon
+                      %span.text-sm.font-medium{ class: planned.completed? ? 'text-green-300' : missed ? 'text-red-300 line-through' : 'text-gray-300' }
+                        = planned.title
+                    .text-xs.text-gray-500
+                      = planned.target_duration_formatted
+              - day_activities.select { |a| a.planned_session.nil? }.each do |activity|
+                = link_to activity_path(activity), class: "block rounded-md p-2 bg-gray-800 ring-1 ring-gray-700" do
+                  .flex.items-center.justify-between
+                    .flex.items-center.gap-2
+                      %span= activity.sport_icon
+                      %span.text-sm.font-medium.text-gray-100= activity.title.presence || activity.sport.humanize
+                    .text-xs.text-gray-400= activity.distance_km ? "#{activity.distance_km}km" : activity.duration_formatted
               - if day_activities.empty? && day_planned.empty?
-                .flex.items-center.justify-center.h-full
-                  %span.text-xs.text-gray-600.italic Repos
+                %span.text-xs.text-gray-600.italic Repos
 
     -# Bilan hebdomadaire
     .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
@@ -187,4 +229,5 @@
 
   -# Navigation bas de page
   .flex.justify-center.pt-2
-    = link_to "Export JSON", export_week_path(date: @start_of_week), class: "text-xs text-gray-500 hover:text-gray-400"
+    .hidden.md:block
+      = link_to "Export JSON", export_week_path(date: @start_of_week), class: "text-xs text-gray-500 hover:text-gray-400"

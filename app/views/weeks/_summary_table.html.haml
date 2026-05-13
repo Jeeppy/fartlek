@@ -3,28 +3,29 @@
 - totals = week_totals(@activities)
 - if sport_summary.any?
   .rounded-lg.bg-gray-900.ring-1.ring-gray-800.overflow-hidden
-    %table.w-full.text-sm
-      %thead
-        %tr.border-b.border-gray-800.text-left.text-xs.text-gray-500
-          %th.px-5.py-3 Discipline
-          %th.px-5.py-3 Séances
-          %th.px-5.py-3 Distance
-          %th.px-5.py-3 Durée
-          %th.px-5.py-3 D+
-      %tbody
-        - sport_summary.each do |sport, data|
-          %tr.border-b.border-gray-800
-            %td.px-5.py-3.text-gray-100
-              %span.mr-2= Activity.new(sport: sport).sport_icon
-              = I18n.t("sports.#{sport}", default: sport.humanize)
-            %td.px-5.py-3.text-gray-300= data[:count]
-            %td.px-5.py-3.text-gray-300= %w[ppg swimming].include?(sport) ? "—" : "#{data[:distance_km]} km"
-            %td.px-5.py-3.text-gray-300= format_duration(data[:duration_seconds])
-            %td.px-5.py-3.text-gray-300= %w[ppg swimming].include?(sport) ? "—" : "#{data[:elevation]} m"
-        - if sport_summary.size > 1
-          %tr.border-t-2.border-gray-700.font-semibold
-            %td.px-5.py-3.text-gray-100 Total
-            %td.px-5.py-3.text-gray-100= totals[:count]
-            %td.px-5.py-3.text-gray-100= "#{totals[:distance_km]} km"
-            %td.px-5.py-3.text-gray-100= format_duration(totals[:duration_seconds])
-            %td.px-5.py-3.text-gray-100= "#{totals[:elevation]} m"
+    .overflow-x-auto
+      %table.w-full.text-sm
+        %thead
+          %tr.border-b.border-gray-800.text-left.text-xs.text-gray-500
+            %th.px-5.py-3 Discipline
+            %th.px-5.py-3 Séances
+            %th.px-5.py-3 Distance
+            %th.px-5.py-3 Durée
+            %th.px-5.py-3 D+
+        %tbody
+          - sport_summary.each do |sport, data|
+            %tr.border-b.border-gray-800
+              %td.px-5.py-3.text-gray-100
+                %span.mr-2= Activity.new(sport: sport).sport_icon
+                = I18n.t("sports.#{sport}", default: sport.humanize)
+              %td.px-5.py-3.text-gray-300= data[:count]
+              %td.px-5.py-3.text-gray-300= %w[ppg swimming].include?(sport) ? "—" : "#{data[:distance_km]} km"
+              %td.px-5.py-3.text-gray-300= format_duration(data[:duration_seconds])
+              %td.px-5.py-3.text-gray-300= %w[ppg swimming].include?(sport) ? "—" : "#{data[:elevation]} m"
+          - if sport_summary.size > 1
+            %tr.border-t-2.border-gray-700.font-semibold
+              %td.px-5.py-3.text-gray-100 Total
+              %td.px-5.py-3.text-gray-100= totals[:count]
+              %td.px-5.py-3.text-gray-100= "#{totals[:distance_km]} km"
+              %td.px-5.py-3.text-gray-100= format_duration(totals[:duration_seconds])
+              %td.px-5.py-3.text-gray-100= "#{totals[:elevation]} m"
