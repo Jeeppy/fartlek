@@ -21,7 +21,7 @@
           = @current_phase.name
 
     -# Etat du jour
-    .grid.grid-cols-2.gap-4
+    .grid.grid-cols-1.gap-4.md:grid-cols-2
       .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
         - if @fitness.any?
           - state = Training::DailyState.new(@fitness.last, @today_journal).call
@@ -64,13 +64,13 @@
             %span.text-sm.font-semibold.text-blue-400= last[:ctl]
 
     -# Ce mois + Cette semaine
-    .grid.grid-cols-2.gap-4
+    .grid.grid-cols-1.gap-4.md:grid-cols-2
       -# Ce mois
       .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800.flex.flex-col.h-full
         .flex.items-center.justify-between.mb-4
           %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Ce mois
           %span.text-xs.text-gray-600= l(Date.current, format: "%B %Y").capitalize
-        .grid.grid-cols-4.gap-4
+        .grid.grid-cols-2.gap-4.md:grid-cols-4
           = render "stat_mini", label: "Séances", value: @volume[:current][:count]
           = render "stat_mini", label: "Distance", value: "#{@volume[:current][:distance_km]} km"
           = render "stat_mini", label: "Durée", value: format_duration(@volume[:current][:duration_seconds])
@@ -99,7 +99,7 @@
           %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider Cette semaine
           %span.text-xs.text-gray-600 🔥 #{@streak} jour(s)
         - if @weekly[:current][:count] > 0
-          .grid.grid-cols-4.gap-4
+          .grid.grid-cols-2.gap-4.md:grid-cols-4
             = render "stat_mini", label: "Séances", value: @weekly[:current][:count]
             = render "stat_mini", label: "Distance", value: "#{@weekly[:current][:distance_km]} km"
             = render "stat_mini", label: "Durée", value: format_duration(@weekly[:current][:duration_seconds])
@@ -128,7 +128,7 @@
           .flex.items-center.justify-center.flex-1
             %p.text-gray-500.text-sm Aucune activité cette semaine.
 
-    .grid.grid-cols-2.gap-4{ class: "grid-rows-[1fr]" }
+    .grid.grid-cols-1.gap-4.md:grid-cols-2{ class: "grid-rows-[1fr]" }
       -# Aujourd'hui
       -# Aujourd'hui + Prochaine séance
       .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800.flex.flex-col
@@ -229,7 +229,7 @@
     -# Volume hebdomadaire (12 semaines)
     .rounded-lg.bg-gray-900.p-5.ring-1.ring-gray-800
       %h2.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.mb-4 Volume hebdomadaire (12 semaines)
-      .grid.grid-cols-2.gap-6
+      .grid.grid-cols-1.gap-6.md:grid-cols-2
         %div
           %h3.text-xs.text-gray-500.mb-2 Distance (km)
           .h-48.overflow-hidden
