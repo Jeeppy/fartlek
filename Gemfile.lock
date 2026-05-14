@@ -164,8 +164,8 @@ GEM
       rubocop (>= 1.0)
       sysexits (~> 1.1)
     hashdiff (1.2.1)
-    hiredis-client (0.28.0)
-      redis-client (= 0.28.0)
+    hiredis-client (0.29.0)
+      redis-client (= 0.29.0)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     image_processing (1.14.0)
@@ -322,7 +322,7 @@ GEM
     redcarpet (3.6.1)
     redis (5.4.1)
       redis-client (>= 0.22.0)
-    redis-client (0.28.0)
+    redis-client (0.29.0)
       connection_pool
     regexp_parser (2.12.0)
     reline (0.6.3)
@@ -487,7 +487,7 @@ DEPENDENCIES
   groupdate (~> 6.5)
   haml-rails (~> 3.0)
   haml_lint (~> 0.73.0)
-  hiredis-client (~> 0.28.0)
+  hiredis-client (~> 0.29.0)
   image_processing (~> 1.2)
   importmap-rails
   kamal
