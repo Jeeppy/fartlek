@@ -16,7 +16,7 @@ gem "tailwindcss-rails"
 gem "turbo-rails"
 
 # ─── Auth ─────────────────────────────────────────────
-gem "devise", "~> 4.9"
+gem "devise", "~> 5.0"
 
 # ─── Background jobs & Redis ─────────────────────────
 gem "connection_pool", "~> 2.4"
