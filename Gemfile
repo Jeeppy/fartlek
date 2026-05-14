@@ -31,7 +31,7 @@ gem "faraday", "~> 2.12"
 gem "chartkick", "~> 5.1"
 gem "groupdate", "~> 6.5"
 gem "image_processing", "~> 1.2"
-gem "pagy", "~> 9.0"
+gem "pagy", "~> 43.5"
 
 # ─── Deploy ───────────────────────────────────────────
 gem "kamal", require: false
