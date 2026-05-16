@@ -44,13 +44,16 @@ module ApplicationHelper
   def render_markdown(text)
     return "" if text.blank?
 
+    # Ajoute une ligne vide avant les listes si nécessaire
+    processed = text.gsub(/([^\n])\n(\s*[-*+])/, "\\1\n\n\\2")
+
     renderer = Redcarpet::Render::HTML.new(hard_wrap: true)
     markdown = Redcarpet::Markdown.new(renderer,
                                        autolink: true,
                                        tables: true,
                                        fenced_code_blocks: true,
                                        lax_spacing: true)
-    sanitize(markdown.render(text))
+    sanitize(markdown.render(processed))
   end
 
   def notifications
