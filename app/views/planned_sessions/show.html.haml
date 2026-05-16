@@ -45,7 +45,7 @@
     - if @planned_session.description.present?
       .rounded-lg.bg-gray-800.p-4.ring-1.ring-gray-700
         %h4.text-xs.font-medium.text-gray-500.mb-2 Détail de la séance
-        .text-sm.text-gray-300.prose.prose-invert.prose-sm.max-w-none
+        .text-sm.text-gray-300.prose.prose-invert.prose-sm.max-w-none.prose-headings:text-gray-100.prose-li:text-gray-300
           = render_markdown(@planned_session.description)
 
     -# Activité liée
